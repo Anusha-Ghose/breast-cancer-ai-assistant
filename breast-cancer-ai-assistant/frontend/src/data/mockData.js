@@ -64,8 +64,12 @@ export const chatExamples = [
 ]
 
 export const documentTypes = [
-  { id: 'mammogram', label: 'Mammogram report', hint: 'PDF or scanned image' },
-  { id: 'biopsy', label: 'Biopsy / pathology report', hint: 'PDF or scanned image' },
-  { id: 'bloodwork', label: 'Tumor marker bloodwork', hint: 'CA 15-3, CA 27-29, CEA' },
-  { id: 'prescription', label: 'Handwritten prescription', hint: 'Photo of oncologist notes' },
+  { id: 'mammogram', label: 'Mammogram report', hint: 'PDF document' },
+  { id: 'biopsy', label: 'Biopsy / pathology report', hint: 'PDF document' },
+  { id: 'bloodwork', label: 'Tumor marker bloodwork', hint: 'PDF document' },
+  { id: 'prescription', label: 'Prescription', hint: 'PDF document' },
+  { id: 'surgical', label: 'Surgical / Operative Notes', hint: 'PDF document' },
+  { id: 'scan', label: 'MRI / Ultrasound / CT Scan', hint: 'PDF document' },
+  { id: 'discharge', label: 'Discharge Summary', hint: 'PDF document' },
+  { id: 'other', label: 'Other Medical Record', hint: 'PDF document' },
 ]

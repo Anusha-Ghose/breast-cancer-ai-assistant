@@ -5,6 +5,7 @@ import Card from '../components/common/Card.jsx'
 import UploadDropzone from '../components/upload/UploadDropzone.jsx'
 import DocumentTypeSelector from '../components/upload/DocumentTypeSelector.jsx'
 import Translate from '../components/common/Translate.jsx'
+import { uploadReport } from '../services/api.js'
 
 export default function UploadPage() {
   const [docType, setDocType] = useState('mammogram')
@@ -12,13 +13,19 @@ export default function UploadPage() {
   const [processing, setProcessing] = useState(false)
   const navigate = useNavigate()
 
-  const handleAnalyze = () => {
+  const [error, setError] = useState(null)
+
+  const handleAnalyze = async () => {
     setProcessing(true)
-    // In production this posts to POST /api/reports/upload and polls status.
-    setTimeout(() => {
+    setError(null)
+    try {
+      const res = await uploadReport(file, docType)
+      navigate(`/report?id=${res.data.id}`)
+    } catch (err) {
+      setError(err.response?.data?.detail || 'Failed to upload report. Please try again.')
+    } finally {
       setProcessing(false)
-      navigate('/report')
-    }, 1600)
+    }
   }
 
   return (
@@ -38,6 +45,12 @@ export default function UploadPage() {
         <h2 className="mb-3 text-sm font-medium text-ink"><Translate>File</Translate></h2>
         <UploadDropzone onFilesSelected={(files) => setFile(files[0])} />
       </Card>
+
+      {error && (
+        <div className="mt-4 p-4 bg-red-50 text-red-600 rounded-2xl border border-red-100 text-sm">
+          {error}
+        </div>
+      )}
 
       <button
         onClick={handleAnalyze}

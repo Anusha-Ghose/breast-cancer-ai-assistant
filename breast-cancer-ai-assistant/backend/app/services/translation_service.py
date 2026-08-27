@@ -23,7 +23,8 @@ def translate(text: str, target_lang: str) -> str:
                 {"role": "system", "content": "You are a professional medical translator. Return only the translation."},
                 {"role": "user", "content": prompt}
             ],
-            temperature=0.1
+            temperature=0.1,
+            max_tokens=2048
         )
         return response.choices[0].message.content.strip()
     except Exception as e:
@@ -63,7 +64,8 @@ Texts to translate:
                 {"role": "user", "content": prompt}
             ],
             response_format={"type": "json_object"},
-            temperature=0.1
+            temperature=0.1,
+            max_tokens=4096
         )
         content = response.choices[0].message.content.strip()
         data = json.loads(content)

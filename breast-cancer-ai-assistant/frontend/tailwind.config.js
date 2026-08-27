@@ -1,26 +1,36 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ["./index.html", "./src/**/*.{js,jsx}"],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
+        white: "rgb(var(--color-white) / <alpha-value>)",
         ink: {
-          DEFAULT: "#1B2A41",
-          light: "#2E4257",
-          soft: "#4A5D73"
+          DEFAULT: "rgb(var(--color-ink) / <alpha-value>)",
+          light: "rgb(var(--color-ink-light) / <alpha-value>)",
+          soft: "rgb(var(--color-ink-soft) / <alpha-value>)"
         },
         porcelain: {
-          DEFAULT: "#F8F5F1",
-          dim: "#F1ECE5"
+          DEFAULT: "rgb(var(--color-porcelain) / <alpha-value>)",
+          dim: "rgb(var(--color-porcelain-dim) / <alpha-value>)"
         },
         rose: {
-          50: "#FBF0EF",
-          100: "#F3DCDC",
-          300: "#D89AA0",
-          500: "#B76E79",
-          600: "#9C5560",
-          700: "#7A3F49",
-          900: "#4A2029"
+          50: "rgb(var(--color-rose-50) / <alpha-value>)",
+          100: "rgb(var(--color-rose-100) / <alpha-value>)",
+          300: "rgb(var(--color-rose-300) / <alpha-value>)",
+          500: "rgb(var(--color-rose-500) / <alpha-value>)",
+          600: "rgb(var(--color-rose-600) / <alpha-value>)",
+          700: "rgb(var(--color-rose-700) / <alpha-value>)",
+          900: "rgb(var(--color-rose-900) / <alpha-value>)"
+        },
+        blue: {
+          50: "rgb(var(--color-blue-50) / <alpha-value>)",
+          100: "rgb(var(--color-blue-100) / <alpha-value>)",
+          200: "rgb(var(--color-blue-200) / <alpha-value>)",
+          600: "rgb(var(--color-blue-600) / <alpha-value>)",
+          800: "rgb(var(--color-blue-800) / <alpha-value>)",
+          900: "rgb(var(--color-blue-900) / <alpha-value>)"
         },
         sage: {
           50: "#EDF3EF",

@@ -6,6 +6,7 @@ import UploadPage from './pages/UploadPage.jsx'
 import ReportInsightsPage from './pages/ReportInsightsPage.jsx'
 import TrendsPage from './pages/TrendsPage.jsx'
 import AssistantPage from './pages/AssistantPage.jsx'
+import HistoryPage from './pages/HistoryPage.jsx'
 
 export default function App() {
   return (
@@ -18,6 +19,7 @@ export default function App() {
           <Route path="/report" element={<ReportInsightsPage />} />
           <Route path="/trends" element={<TrendsPage />} />
           <Route path="/assistant" element={<AssistantPage />} />
+          <Route path="/history" element={<HistoryPage />} />
         </Routes>
       </main>
       <MobileTabBar />

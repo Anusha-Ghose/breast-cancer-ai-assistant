@@ -2,16 +2,25 @@
 Entry point for the Breast Health Copilot API.
 Run locally with: uvicorn main:app --reload
 """
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
+from app.db.database import connect_to_mongo, close_mongo_connection
 from app.api import routes_auth, routes_upload, routes_reports, routes_trends, routes_chat, routes_translate
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await connect_to_mongo()
+    yield
+    await close_mongo_connection()
+
 app = FastAPI(
-    title="Breast Health Copilot API",
-    description="OCR + NLP + LLM pipeline for breast cancer report analysis",
-    version="0.1.0",
+    title="Multimodal AI Healthcare Assistant API",
+    description="OCR + NLP + LLM pipeline for medical report analysis",
+    version="1.0.0",
+    lifespan=lifespan
 )
 
 app.add_middleware(

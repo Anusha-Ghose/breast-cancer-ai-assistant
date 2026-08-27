@@ -1,10 +1,11 @@
 import { NavLink } from 'react-router-dom'
-import { Home, Upload, FileText, TrendingUp, MessageCircle } from 'lucide-react'
+import { Home, Upload, FileText, TrendingUp, MessageCircle, Clock } from 'lucide-react'
+import Translate from '../common/Translate.jsx'
 
 const TABS = [
   { to: '/', label: 'Home', icon: Home },
   { to: '/upload', label: 'Upload', icon: Upload },
-  { to: '/report', label: 'Report', icon: FileText },
+  { to: '/history', label: 'History', icon: Clock },
   { to: '/trends', label: 'Trends', icon: TrendingUp },
   { to: '/assistant', label: 'Chat', icon: MessageCircle },
 ]
@@ -24,7 +25,7 @@ export default function MobileTabBar() {
           }
         >
           <Icon size={20} strokeWidth={2} />
-          {label}
+          <Translate>{label}</Translate>
         </NavLink>
       ))}
     </nav>

@@ -1,10 +1,9 @@
-import { useState } from 'react'
-import { Send, Database } from 'lucide-react'
+import { useRef, useEffect } from 'react'
+import { Send, Database, Loader2 } from 'lucide-react'
 import Card from '../components/common/Card.jsx'
 import ChatBubble from '../components/chat/ChatBubble.jsx'
-import { chatExamples } from '../data/mockData.js'
 import { useLanguage } from '../context/LanguageContext.jsx'
-import { translateText } from '../services/api.js'
+import { useAssistant } from '../context/AssistantContext.jsx'
 import Translate from '../components/common/Translate.jsx'
 
 const SUGGESTIONS = [
@@ -15,41 +14,15 @@ const SUGGESTIONS = [
 
 export default function AssistantPage() {
   const { lang, t } = useLanguage()
-  const [messages, setMessages] = useState(chatExamples)
-  const [input, setInput] = useState('')
-  const [isTyping, setIsTyping] = useState(false)
+  const { messages, input, setInput, isTyping, send } = useAssistant()
+  const messagesEndRef = useRef(null)
 
-  const send = async (text) => {
-    if (!text.trim()) return
-    
-    // Add user message immediately
-    setMessages((prev) => [
-      ...prev,
-      { role: 'user', text },
-    ])
-    setInput('')
-    setIsTyping(true)
-    
-    let replyText = 'This is a demo response. In production this calls the RAG pipeline, retrieving passages from your uploaded reports and a verified medical knowledge base before generating an answer.'
-    
-    if (lang !== 'en') {
-      try {
-        const res = await translateText(replyText, lang)
-        replyText = res.data.translated_text || replyText
-      } catch (err) {
-        console.error('Translation error:', err)
-      }
-    }
-    
-    setMessages((prev) => [
-      ...prev,
-      {
-        role: 'assistant',
-        text: replyText,
-        grounded: true,
-      },
-    ])
-    setIsTyping(false)
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }, [messages, isTyping])
+
+  const handleSend = (text) => {
+    send(text, lang)
   }
 
   return (
@@ -66,6 +39,15 @@ export default function AssistantPage() {
           {messages.map((m, i) => (
             <ChatBubble key={i} {...m} />
           ))}
+          {isTyping && (
+            <div className="flex justify-start">
+              <div className="max-w-[80%] rounded-2xl rounded-bl-sm border border-ink/5 bg-white text-ink px-4 py-3 text-sm flex items-center gap-2">
+                <Loader2 className="animate-spin text-rose-500" size={16} />
+                <span className="italic text-ink-soft"><Translate>Thinking...</Translate></span>
+              </div>
+            </div>
+          )}
+          <div ref={messagesEndRef} />
         </div>
 
         <div className="border-t border-ink/5 p-4">
@@ -73,7 +55,7 @@ export default function AssistantPage() {
             {SUGGESTIONS.map((s) => (
               <button
                 key={s}
-                onClick={() => send(s)}
+                onClick={() => handleSend(s)}
                 className="focus-ring rounded-full border border-ink/10 px-3 py-1.5 text-xs text-ink-soft transition hover:border-rose-300 hover:text-rose-600"
               >
                 <Translate>{s}</Translate>
@@ -83,7 +65,7 @@ export default function AssistantPage() {
           <form
             onSubmit={(e) => {
               e.preventDefault()
-              send(input)
+              handleSend(input)
             }}
             className="flex items-center gap-2"
           >

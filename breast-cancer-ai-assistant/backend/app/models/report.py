@@ -1,22 +1,21 @@
-"""Report SQLAlchemy model."""
-from sqlalchemy import Column, String, Float, DateTime, ForeignKey, JSON
-from sqlalchemy.orm import declarative_base
-import datetime
+from pydantic import BaseModel, Field
+from typing import Optional, Dict, Any
+from datetime import datetime
 
-Base = declarative_base()
+class ReportBase(BaseModel):
+    patient_id: str
+    document_type: str # 'digital_pdf', 'scanned_pdf', 'image', 'handwritten'
+    original_filename: str
 
+class ReportCreate(ReportBase):
+    pass
 
-class Report(Base):
-    __tablename__ = "reports"
+class ReportInDB(ReportBase):
+    file_path: str
+    upload_date: datetime = Field(default_factory=datetime.utcnow)
+    status: str = "processing" # processing, completed, failed
+    ocr_text: Optional[str] = None
+    extracted_entities: Optional[Dict[str, Any]] = None
 
-    id = Column(String, primary_key=True)
-    patient_id = Column(String, ForeignKey("patients.id"))
-    document_type = Column(String)  # mammogram | biopsy | bloodwork | prescription
-    bi_rads_score = Column(Integer, nullable=True)
-    tumor_size_cm = Column(Float, nullable=True)
-    histology = Column(String, nullable=True)
-    grade = Column(String, nullable=True)
-    lymph_node_status = Column(String, nullable=True)
-    summary_text = Column(String, nullable=True)
-    raw_extraction = Column(JSON)  # full structured extraction incl. confidence scores
-    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+class ReportOut(ReportInDB):
+    id: str

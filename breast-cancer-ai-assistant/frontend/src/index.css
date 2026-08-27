@@ -2,6 +2,56 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  :root {
+    --color-white: 255 255 255;
+    --color-ink: 27 42 65;
+    --color-ink-light: 46 66 87;
+    --color-ink-soft: 74 93 115;
+    --color-porcelain: 248 245 241;
+    --color-porcelain-dim: 241 236 229;
+
+    --color-rose-50: 251 240 239;
+    --color-rose-100: 243 220 220;
+    --color-rose-300: 216 154 160;
+    --color-rose-500: 183 110 121;
+    --color-rose-600: 156 85 96;
+    --color-rose-700: 122 63 73;
+    --color-rose-900: 74 32 41;
+
+    --color-blue-50: 239 246 255;
+    --color-blue-100: 219 234 254;
+    --color-blue-200: 191 219 254;
+    --color-blue-600: 37 99 235;
+    --color-blue-800: 30 64 175;
+    --color-blue-900: 30 58 138;
+  }
+
+  .dark {
+    --color-white: 27 42 65;
+    --color-ink: 248 245 241;
+    --color-ink-light: 241 236 229;
+    --color-ink-soft: 156 163 175;
+    --color-porcelain: 15 23 42;
+    --color-porcelain-dim: 27 42 65;
+
+    --color-rose-50: 74 32 41;
+    --color-rose-100: 122 63 73;
+    --color-rose-300: 156 85 96;
+    --color-rose-500: 183 110 121;
+    --color-rose-600: 216 154 160;
+    --color-rose-700: 243 220 220;
+    --color-rose-900: 251 240 239;
+
+    --color-blue-50: 30 58 138;
+    --color-blue-100: 30 64 175;
+    --color-blue-200: 37 99 235;
+    --color-blue-600: 191 219 254;
+    --color-blue-800: 219 234 254;
+    --color-blue-900: 239 246 255;
+  }
+}
+
 html {
   scroll-behavior: smooth;
 }

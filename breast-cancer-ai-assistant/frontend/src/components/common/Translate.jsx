@@ -19,18 +19,24 @@ const processBatch = async () => {
 
   for (const lang of Object.keys(byLang)) {
     const items = byLang[lang]
-    const texts = items.map(i => i.text)
+    
+    // Process in smaller chunks sequentially to respect API rate limits
+    const CHUNK_SIZE = 8
+    for (let i = 0; i < items.length; i += CHUNK_SIZE) {
+      const chunk = items.slice(i, i + CHUNK_SIZE)
+      const texts = chunk.map(i => i.text)
 
-    try {
-      const res = await translateTextBatch(texts, lang)
-      const translatedTexts = res.data.translated_texts || texts
-      
-      items.forEach((item, index) => {
-        item.resolve(translatedTexts[index] || item.text)
-      })
-    } catch (err) {
-      console.error('Batch translation error:', err)
-      items.forEach(item => item.resolve(item.text))
+      try {
+        const res = await translateTextBatch(texts, lang)
+        const translatedTexts = res.data.translated_texts || texts
+        
+        chunk.forEach((item, index) => {
+          item.resolve(translatedTexts[index] || item.text)
+        })
+      } catch (err) {
+        console.error('Batch translation error:', err)
+        chunk.forEach(item => item.resolve(item.text))
+      }
     }
   }
 }

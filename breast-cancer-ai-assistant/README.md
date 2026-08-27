@@ -1,8 +1,62 @@
-# Halcyon — Breast Health Copilot
+# Multimodal AI Healthcare Assistant - Backend
 
-Cloud-based multimodal AI healthcare assistant, specialized for breast cancer report
-analysis: mammogram findings, biopsy/pathology reports, tumor-marker bloodwork, and
-handwritten prescriptions, turned into plain-language, personalized health insights.
+A complete production-ready backend for a Cloud-Based Multimodal AI Healthcare Assistant.
+
+## Tech Stack
+- **Framework**: FastAPI (Python 3.11+)
+- **Database**: MongoDB (Motor Async)
+- **Vector DB**: ChromaDB
+- **AI & NLP**: LangChain, Groq (LLaMA 3-70B)
+- **OCR**: pdfplumber, pytesseract (Tesseract)
+- **Security**: JWT Authentication (python-jose, bcrypt)
+
+## Architecture Overview
+The backend follows clean architecture:
+- `app/api/`: FastAPI routers and endpoints.
+- `app/core/`: Security and configuration.
+- `app/db/`: MongoDB setup.
+- `app/models/`: Pydantic schemas.
+- `app/services/`: Core business logic (OCR, NLP extraction, RAG, Comparison).
+
+## Database Collections (MongoDB)
+- `users`: Stores user credentials, roles, and profiles.
+- `reports`: Stores metadata, file paths, raw OCR text, and structured NLP entities.
+
+## Getting Started
+
+### 1. Environment Setup
+Create a `.env` file in the root directory (where `docker-compose.yml` is located):
+```
+# Shared Environment Variables
+GROQ_API_KEY=your_groq_key
+MONGO_URI=mongodb://mongo:27017/healthcare_assistant
+JWT_SECRET=super_secret_key
+VECTOR_DB_PATH=./data/vectorstore
+CORS_ORIGINS='["http://localhost", "http://localhost:80", "http://localhost:5173"]'
+UPLOAD_DIR=./data/uploads
+
+VITE_API_BASE_URL=http://localhost:8000/api
+```
+
+### 2. Docker Setup (Recommended)
+You can run the entire stack (Frontend, Backend, and MongoDB) using Docker Compose:
+```bash
+docker compose up --build
+```
+- **Frontend** will be available at `http://localhost`.
+- **Backend API** will be available at `http://localhost:8000`.
+- **MongoDB** will be available on `localhost:27017`.
+
+## API Documentation
+Once the server is running, visit `http://localhost:8000/docs` for the interactive Swagger UI.
+
+### Key Endpoints:
+- **Auth**: `POST /api/auth/signup`, `POST /api/auth/login`
+- **Upload**: `POST /api/reports/upload` (Supports digital PDFs, scanned images)
+- **Reports**: `GET /api/reports/` (List all), `GET /api/reports/{id}`
+- **Timeline**: `GET /api/trends/timeline` (Get historical lab values)
+- **Compare**: `GET /api/trends/compare?id1=X&id2=Y` (AI summary of changes)
+- **Chat**: `POST /api/chat` (RAG-powered conversational assistant)
 
 ## Structure
 
