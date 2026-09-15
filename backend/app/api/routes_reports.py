@@ -5,13 +5,15 @@ from bson import ObjectId
 import os
 
 from app.db.database import db
-from app.core.security import get_current_user_id
+from app.core.security import get_current_user_id, get_optional_user_id
 from app.models.report import ReportOut
 
 router = APIRouter()
 
 @router.get("/", response_model=List[ReportOut])
-async def list_reports(user_id: str = Depends(get_current_user_id)):
+async def list_reports(user_id: str | None = Depends(get_optional_user_id)):
+    if not user_id:
+        return []
     cursor = db.db.reports.find({"patient_id": user_id}).sort("upload_date", -1)
     reports = await cursor.to_list(length=100)
     

@@ -69,8 +69,9 @@ const CustomTooltip = ({ active, payload, label, insights }) => {
   return null
 }
 
-export default function ComparisonChart({ chartData, insights }) {
-  if (!chartData || chartData.length === 0) {
+export default function ComparisonChart({ chartData, data, insights }) {
+  const items = chartData || data || []
+  if (!items || items.length === 0) {
     return (
       <div className="h-64 w-full flex items-center justify-center text-ink-soft text-sm">
         No common parameters found to compare.
@@ -81,7 +82,7 @@ export default function ComparisonChart({ chartData, insights }) {
   return (
     <div className="h-96 w-full mt-6 pb-8">
       <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={chartData} margin={{ top: 20, right: 12, bottom: 100, left: -12 }}>
+        <BarChart data={items} margin={{ top: 20, right: 12, bottom: 100, left: -12 }}>
           <CartesianGrid stroke="#1B2A4114" vertical={false} />
           <XAxis 
             dataKey="parameter" 
