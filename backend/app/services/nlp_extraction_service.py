@@ -54,7 +54,7 @@ async def extract_entities(raw_text: str, document_type: str) -> dict:
         
     llm = ChatGroq(
         temperature=0,
-        model_name="llama-3.3-70b-versatile",
+        model_name="qwen/qwen3.8-27b",
         api_key=settings.groq_api_key
     )
     
