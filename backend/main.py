@@ -40,6 +40,10 @@ app.include_router(routes_translate.router, prefix="/api/translate", tags=["tran
 app.include_router(routes_sandbox.router, prefix="/api/sandbox", tags=["sandbox"])
 app.include_router(routes_triage.router, prefix="/api/triage", tags=["triage"])
 
-@app.get("/api/health")
+@app.api_route("/", methods=["GET", "HEAD"])
+def root():
+    return {"status": "ok", "service": "breast-cancer-ai-assistant"}
+
+@app.api_route("/api/health", methods=["GET", "HEAD"])
 def health_check():
     return {"status": "ok"}
