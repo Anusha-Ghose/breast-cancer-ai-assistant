@@ -1,3 +1,5 @@
+import Translate from '../common/Translate.jsx'
+
 const LEVELS = [
   { score: 0, label: 'Incomplete' },
   { score: 1, label: 'Negative' },
@@ -13,11 +15,13 @@ export default function BIRADSGauge({ score }) {
     <div>
       <div className="flex items-end justify-between">
         <div>
-          <p className="text-xs font-medium uppercase tracking-wide text-ink-soft">BI-RADS category</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-ink-soft">
+            <Translate>BI-RADS category</Translate>
+          </p>
           <p className="font-display text-4xl text-ink">
             {score}
             <span className="ml-2 text-lg font-sans font-medium text-rose-600">
-              {LEVELS[score]?.label}
+              <Translate>{LEVELS[score]?.label}</Translate>
             </span>
           </p>
         </div>
@@ -35,8 +39,8 @@ export default function BIRADSGauge({ score }) {
         ))}
       </div>
       <div className="mt-1.5 flex justify-between text-[10px] text-ink-soft">
-        <span>0 · Incomplete</span>
-        <span>6 · Malignancy</span>
+        <span>0 · <Translate>Incomplete</Translate></span>
+        <span>6 · <Translate>Malignancy</Translate></span>
       </div>
     </div>
   )

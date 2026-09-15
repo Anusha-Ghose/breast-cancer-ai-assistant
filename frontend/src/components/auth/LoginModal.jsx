@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { X, Mail, Lock, User as UserIcon, Loader2 } from 'lucide-react';
+import Translate from '../common/Translate';
 
 export default function LoginModal({ isOpen, onClose }) {
   const [isLogin, setIsLogin] = useState(true);
@@ -11,6 +13,7 @@ export default function LoginModal({ isOpen, onClose }) {
   const [loading, setLoading] = useState(false);
 
   const { login, signup } = useAuth();
+  const { t } = useLanguage();
 
   if (!isOpen) return null;
 
@@ -49,10 +52,12 @@ export default function LoginModal({ isOpen, onClose }) {
 
           <div className="text-center mb-8">
             <h2 className="text-2xl font-display font-semibold text-ink">
-              {isLogin ? 'Welcome back' : 'Create an account'}
+              <Translate>{isLogin ? 'Welcome back' : 'Create an account'}</Translate>
             </h2>
             <p className="text-sm text-ink-soft mt-2">
-              {isLogin ? 'Sign in to access your medical insights.' : 'Join Halcyon to take control of your health data.'}
+              <Translate>
+                {isLogin ? 'Sign in to access your medical insights.' : 'Join Halcyon to take control of your health data.'}
+              </Translate>
             </p>
           </div>
 
@@ -64,7 +69,7 @@ export default function LoginModal({ isOpen, onClose }) {
                 </div>
                 <input
                   type="text"
-                  placeholder="Full Name"
+                  placeholder={t('Full Name')}
                   required
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
@@ -79,7 +84,7 @@ export default function LoginModal({ isOpen, onClose }) {
               </div>
               <input
                 type="email"
-                placeholder="Email address"
+                placeholder={t('Email address')}
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -93,7 +98,7 @@ export default function LoginModal({ isOpen, onClose }) {
               </div>
               <input
                 type="password"
-                placeholder="Password"
+                placeholder={t('Password')}
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -113,12 +118,12 @@ export default function LoginModal({ isOpen, onClose }) {
               className="w-full py-2.5 bg-ink text-white font-medium rounded-xl hover:bg-ink-light focus:outline-none focus:ring-4 focus:ring-ink/10 transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-2"
             >
               {loading && <Loader2 size={18} className="animate-spin" />}
-              {isLogin ? 'Sign In' : 'Create Account'}
+              <Translate>{isLogin ? 'Sign In' : 'Create Account'}</Translate>
             </button>
           </form>
 
           <div className="mt-6 text-center text-sm text-ink-soft">
-            {isLogin ? "Don't have an account? " : "Already have an account? "}
+            <Translate>{isLogin ? "Don't have an account? " : "Already have an account? "}</Translate>
             <button
               onClick={() => {
                 setIsLogin(!isLogin);
@@ -126,7 +131,7 @@ export default function LoginModal({ isOpen, onClose }) {
               }}
               className="text-rose-500 hover:text-rose-600 font-medium transition-colors"
             >
-              {isLogin ? 'Sign up' : 'Sign in'}
+              <Translate>{isLogin ? 'Sign up' : 'Sign in'}</Translate>
             </button>
           </div>
         </div>

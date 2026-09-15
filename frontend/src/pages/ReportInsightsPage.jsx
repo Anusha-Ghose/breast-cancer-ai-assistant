@@ -148,12 +148,12 @@ export default function ReportInsightsPage() {
                   <Translate>Physician Handwritten Prescription Extraction</Translate>
                 </h3>
                 <p className="text-xs text-purple-800">
-                  OCR Vision LLM decoded physician handwriting with sig directions & dosage instructions.
+                  <Translate>OCR Vision LLM decoded physician handwriting with sig directions & dosage instructions.</Translate>
                 </p>
               </div>
             </div>
             <span className="text-xs font-semibold px-2.5 py-1 bg-purple-100 text-purple-800 rounded-full border border-purple-200">
-              {entities.handwritten_confidence_score || mockPrescriptionData.handwritten_confidence_score}% Confidence
+              {entities.handwritten_confidence_score || mockPrescriptionData.handwritten_confidence_score}% <Translate>Confidence</Translate>
             </span>
           </div>
 
@@ -161,20 +161,20 @@ export default function ReportInsightsPage() {
             {(medicines.length > 0 ? medicines : mockPrescriptionData.medicines).map((med, idx) => (
               <div key={idx} className="bg-white p-4 rounded-xl border border-purple-100 shadow-sm space-y-2">
                 <div className="flex justify-between items-center">
-                  <span className="font-bold text-ink text-base">{med.name}</span>
+                  <span className="font-bold text-ink text-base"><Translate>{med.name}</Translate></span>
                   <span className="text-xs font-semibold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-full">
-                    {med.dosage || '20mg'}
+                    <Translate>{med.dosage || '20mg'}</Translate>
                   </span>
                 </div>
                 {med.sig && (
                   <p className="text-xs text-ink/90 font-medium bg-porcelain p-2.5 rounded-lg border border-ink/5">
-                    <strong>Sig / Directions:</strong> {med.sig}
+                    <strong><Translate>Sig / Directions:</Translate> </strong> <Translate>{med.sig}</Translate>
                   </p>
                 )}
                 <div className="flex items-center gap-4 text-xs text-ink-soft pt-1">
-                  <span>Frequency: {med.frequency || 'Once Daily'}</span>
-                  <span>Duration: {med.duration || '5 Years'}</span>
-                  {med.refills && <span>Refills: {med.refills}</span>}
+                  <span><Translate>Frequency:</Translate> <Translate>{med.frequency || 'Once Daily'}</Translate></span>
+                  <span><Translate>Duration:</Translate> <Translate>{med.duration || '5 Years'}</Translate></span>
+                  {med.refills && <span><Translate>Refills:</Translate> {med.refills}</span>}
                 </div>
               </div>
             ))}
@@ -198,12 +198,12 @@ export default function ReportInsightsPage() {
               </div>
               {entities.diagnosis?.length > 0 && (
                 <p className="mt-2 text-sm leading-relaxed text-rose-900/90 font-medium">
-                  Diagnosis: {entities.diagnosis.join(', ')}
+                  <Translate>Diagnosis:</Translate> {entities.diagnosis.join(', ')}
                 </p>
               )}
               {entities.symptoms?.length > 0 && (
                 <p className="mt-1 text-sm leading-relaxed text-rose-900/90">
-                  Symptoms: {entities.symptoms.join(', ')}
+                  <Translate>Symptoms:</Translate> {entities.symptoms.join(', ')}
                 </p>
               )}
             </div>
@@ -271,7 +271,7 @@ export default function ReportInsightsPage() {
             </p>
             <ul className="list-disc pl-5 space-y-2 text-sm text-ink/80">
               {entities.doctor_recommendations.map((rec, i) => (
-                <li key={i}>{rec}</li>
+                <li key={i}><Translate>{rec}</Translate></li>
               ))}
             </ul>
           </Card>
@@ -288,21 +288,21 @@ export default function ReportInsightsPage() {
             {labs.map((lab, i) => (
               <div key={i} className={`p-4 rounded-xl border ${lab.is_abnormal ? 'border-rose-200 bg-rose-50/30' : 'border-ink/5 bg-porcelain/30'}`}>
                 <div className="flex justify-between items-center mb-1">
-                  <span className="font-medium text-ink text-sm">{lab.name}</span>
+                  <span className="font-medium text-ink text-sm"><Translate>{lab.name}</Translate></span>
                   <div className="flex gap-1.5 items-center">
                     {lab.confidence_score !== undefined && lab.confidence_score !== null && (
                       <span className="text-[10px] font-medium text-ink-soft bg-ink/5 px-2 py-0.5 rounded-full">
                         {lab.confidence_score}%
                       </span>
                     )}
-                    {lab.is_abnormal && <span className="text-xs font-bold text-rose-600 bg-rose-100 px-2 py-0.5 rounded-full">Abnormal</span>}
+                    {lab.is_abnormal && <span className="text-xs font-bold text-rose-600 bg-rose-100 px-2 py-0.5 rounded-full"><Translate>Abnormal</Translate></span>}
                   </div>
                 </div>
                 <div className="text-xl font-display text-ink mt-2">
                   {lab.value} <span className="text-sm text-ink-soft ml-1">{lab.units}</span>
                 </div>
                 {lab.reference_range && (
-                  <div className="text-xs text-ink-soft mt-1">Ref: {lab.reference_range}</div>
+                  <div className="text-xs text-ink-soft mt-1"><Translate>Ref:</Translate> {lab.reference_range}</div>
                 )}
               </div>
             ))}

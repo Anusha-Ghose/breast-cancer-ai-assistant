@@ -1,4 +1,4 @@
-import { AlertTriangle, ShieldCheck, Stethoscope, ArrowUpRight } from 'lucide-react'
+import { AlertTriangle, ShieldCheck, Stethoscope } from 'lucide-react'
 import Translate from '../common/Translate.jsx'
 
 export default function ClinicalAlertsCard({ alerts = [] }) {
@@ -21,7 +21,7 @@ export default function ClinicalAlertsCard({ alerts = [] }) {
           </div>
         </div>
         <span className="text-xs font-semibold px-2.5 py-1 bg-amber-50 text-amber-700 rounded-full border border-amber-200">
-          {alerts.length} {alerts.length === 1 ? 'Alert' : 'Alerts'}
+          <Translate>{alerts.length === 1 ? '1 Alert' : `${alerts.length} Alerts`}</Translate>
         </span>
       </div>
 
@@ -40,21 +40,21 @@ export default function ClinicalAlertsCard({ alerts = [] }) {
             <div className="flex items-start justify-between gap-3">
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <span className="font-semibold text-sm">{alert.title}</span>
+                  <span className="font-semibold text-sm"><Translate>{alert.title}</Translate></span>
                   <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-white/80 border border-current">
-                    {alert.severity}
+                    <Translate>{alert.severity}</Translate>
                   </span>
                 </div>
-                <p className="text-xs opacity-90 leading-relaxed">{alert.message}</p>
+                <p className="text-xs opacity-90 leading-relaxed"><Translate>{alert.message}</Translate></p>
               </div>
-              <span className="text-xs opacity-60 shrink-0">{alert.date}</span>
+              <span className="text-xs opacity-60 shrink-0"><Translate>{alert.date}</Translate></span>
             </div>
 
             <div className="mt-3 pt-3 border-t border-black/5 flex items-start gap-2 text-xs">
               <Stethoscope size={16} className="text-rose-600 shrink-0 mt-0.5" />
               <div>
-                <strong className="font-semibold">Recommended Doctor Discussion: </strong>
-                <span>{alert.recommendation}</span>
+                <strong className="font-semibold"><Translate>Recommended Doctor Discussion</Translate>: </strong>
+                <span><Translate>{alert.recommendation}</Translate></span>
               </div>
             </div>
           </div>
@@ -63,7 +63,7 @@ export default function ClinicalAlertsCard({ alerts = [] }) {
 
       <div className="p-3 bg-porcelain rounded-xl border border-ink/5 text-[11px] text-ink-soft flex items-center gap-2">
         <ShieldCheck size={14} className="text-emerald-600 shrink-0" />
-        <span>This proactive alert system supports clinical decision-making with your physician rather than replacing medical advice.</span>
+        <span><Translate>This proactive alert system supports clinical decision-making with your physician rather than replacing medical advice.</Translate></span>
       </div>
     </div>
   )

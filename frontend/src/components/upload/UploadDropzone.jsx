@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react'
 import { UploadCloud, FileCheck2 } from 'lucide-react'
+import Translate from '../common/Translate.jsx'
 
 export default function UploadDropzone({ onFilesSelected }) {
   const [isDragging, setIsDragging] = useState(false)
@@ -40,13 +41,19 @@ export default function UploadDropzone({ onFilesSelected }) {
         <>
           <FileCheck2 className="mb-3 text-sage-500" size={32} />
           <p className="text-sm font-medium text-ink">{fileName}</p>
-          <p className="mt-1 text-xs text-ink-soft">Ready to analyze</p>
+          <p className="mt-1 text-xs text-ink-soft">
+            <Translate>Ready to analyze</Translate>
+          </p>
         </>
       ) : (
         <>
           <UploadCloud className="mb-3 text-ink-soft" size={32} />
-          <p className="text-sm font-medium text-ink">Drag a file here, or click to browse</p>
-          <p className="mt-1 text-xs text-ink-soft">PDF, JPG, or PNG — up to 20MB</p>
+          <p className="text-sm font-medium text-ink">
+            <Translate>Drag a file here, or click to browse</Translate>
+          </p>
+          <p className="mt-1 text-xs text-ink-soft">
+            <Translate>PDF, JPG, or PNG — up to 20MB</Translate>
+          </p>
         </>
       )}
     </div>

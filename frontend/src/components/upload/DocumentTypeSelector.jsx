@@ -1,4 +1,5 @@
 import { documentTypes } from '../../data/mockData.js'
+import Translate from '../common/Translate.jsx'
 
 export default function DocumentTypeSelector({ selected, onSelect }) {
   return (
@@ -13,8 +14,8 @@ export default function DocumentTypeSelector({ selected, onSelect }) {
               : 'border-ink/10 bg-white hover:border-ink/20'
           }`}
         >
-          <p className="text-sm font-medium text-ink">{doc.label}</p>
-          <p className="mt-1 text-xs text-ink-soft">{doc.hint}</p>
+          <p className="text-sm font-medium text-ink"><Translate>{doc.label}</Translate></p>
+          <p className="mt-1 text-xs text-ink-soft"><Translate>{doc.hint}</Translate></p>
         </button>
       ))}
     </div>

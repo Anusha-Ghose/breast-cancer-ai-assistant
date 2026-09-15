@@ -123,7 +123,7 @@ export default function TrendsPage() {
             onChange={(e) => setDocTypeFilter(e.target.value)}
             className="appearance-none font-display text-sm font-medium text-ink bg-transparent border border-ink/10 hover:border-ink/20 rounded-lg focus:outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500 pl-9 pr-8 py-2 shadow-sm transition cursor-pointer"
           >
-            <option value="all" className="font-sans text-sm">All Documents</option>
+            <option value="all" className="font-sans text-sm">{t('All Documents')}</option>
             {uniqueDocTypes.map(t => (
               <option key={t} value={t} className="font-sans text-sm">{t.replace('_', ' ')}</option>
             ))}
@@ -177,7 +177,7 @@ export default function TrendsPage() {
               onChange={(e) => setSelectedReport1(e.target.value)}
               className="focus-ring rounded-xl border border-ink/10 bg-porcelain px-4 py-2.5 text-sm text-ink flex-1 min-w-[200px]"
             >
-              <option value="">Select baseline report...</option>
+              <option value="">{t('Select baseline report...')}</option>
               {filteredReports.map((r) => (
                 <option key={r.id} value={r.id}>
                   {r.extracted_entities?.report_date || new Date(r.upload_date).toLocaleDateString()} — {r.document_type.replace('_', ' ')}
@@ -190,7 +190,7 @@ export default function TrendsPage() {
               onChange={(e) => setSelectedReport2(e.target.value)}
               className="focus-ring rounded-xl border border-ink/10 bg-porcelain px-4 py-2.5 text-sm text-ink flex-1 min-w-[200px]"
             >
-              <option value="">Select recent report...</option>
+              <option value="">{t('Select recent report...')}</option>
               {filteredReports.map((r) => (
                 <option key={r.id} value={r.id}>
                   {r.extracted_entities?.report_date || new Date(r.upload_date).toLocaleDateString()} — {r.document_type.replace('_', ' ')}
@@ -215,7 +215,7 @@ export default function TrendsPage() {
                     <p className="font-semibold text-rose-950 text-sm"><Translate>AI Longitudinal Insights</Translate></p>
                     {comparisonData.confidence_score !== undefined && comparisonData.confidence_score !== null && (
                       <span className="text-[11px] font-medium text-rose-600 bg-rose-100 px-2 py-0.5 rounded-full">
-                        {comparisonData.confidence_score}% confidence
+                        {comparisonData.confidence_score}% <Translate>confidence</Translate>
                       </span>
                     )}
                   </div>

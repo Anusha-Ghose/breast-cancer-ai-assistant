@@ -4,9 +4,11 @@ import { Clock, FileText, ChevronRight, Loader2, Calendar, Trash2 } from 'lucide
 import Card from '../components/common/Card.jsx'
 import Badge from '../components/common/Badge.jsx'
 import Translate from '../components/common/Translate.jsx'
+import { useLanguage } from '../context/LanguageContext.jsx'
 import api, { getReports, deleteReport } from '../services/api.js'
 
 export default function HistoryPage() {
+  const { t } = useLanguage()
   const [reports, setReports] = useState([])
   const [loading, setLoading] = useState(true)
   const [deletingId, setDeletingId] = useState(null)
@@ -99,7 +101,7 @@ export default function HistoryPage() {
                   <h3 className="font-semibold text-ink text-lg capitalize flex items-center gap-3">
                     <Translate>{report.document_type.replace('_', ' ')}</Translate>
                     <Badge tone={report.status === 'completed' ? 'success' : 'neutral'}>
-                      {report.status}
+                      <Translate>{report.status}</Translate>
                     </Badge>
                   </h3>
                   <div className="flex items-center gap-4 mt-1 text-sm text-ink-soft">
@@ -127,7 +129,7 @@ export default function HistoryPage() {
                   onClick={(e) => handleDelete(e, report.id)}
                   disabled={deletingId === report.id}
                   className="hidden sm:flex items-center justify-center w-8 h-8 rounded-full text-ink-soft hover:text-rose-600 hover:bg-rose-50 transition"
-                  title="Delete Report"
+                  title={t('Delete Report')}
                 >
                   {deletingId === report.id ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
                 </button>

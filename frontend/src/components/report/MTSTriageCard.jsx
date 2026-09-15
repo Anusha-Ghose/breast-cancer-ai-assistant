@@ -65,7 +65,7 @@ export default function MTSTriageCard({ triage }) {
           </span>
         </div>
         <span className={`px-3 py-1 text-xs font-bold rounded-full ${config.badgeText}`}>
-          {triage.triage_level_name || config.name}
+          <Translate>{triage.triage_level_name || config.name}</Translate>
         </span>
       </div>
 
@@ -76,9 +76,11 @@ export default function MTSTriageCard({ triage }) {
             <Translate>Target Response Window</Translate>
           </div>
           <div className="text-xl font-bold text-ink">
-            {triage.target_time_minutes === 0 ? 'Immediate / STAT' : `< ${triage.target_time_minutes} minutes`}
+            <Translate>{triage.target_time_minutes === 0 ? 'Immediate / STAT' : `< ${triage.target_time_minutes} minutes`}</Translate>
           </div>
-          <p className="text-xs text-ink-soft">Clinical timeframe recommendation based on findings.</p>
+          <p className="text-xs text-ink-soft">
+            <Translate>Clinical timeframe recommendation based on findings.</Translate>
+          </p>
         </div>
 
         <div className="bg-white/80 backdrop-blur rounded-xl p-4 border border-black/5 space-y-2">
@@ -90,7 +92,7 @@ export default function MTSTriageCard({ triage }) {
             {(triage.clinical_indicators || ['Stable parameters']).map((ind, idx) => (
               <div key={idx} className="text-xs font-medium text-ink flex items-center gap-1.5">
                 <ChevronRight size={14} className={config.iconColor} />
-                <span>{ind}</span>
+                <span><Translate>{ind}</Translate></span>
               </div>
             ))}
           </div>
@@ -101,13 +103,17 @@ export default function MTSTriageCard({ triage }) {
         <div className="flex items-start gap-2">
           <Stethoscope size={18} className={`${config.iconColor} shrink-0 mt-0.5`} />
           <div className="space-y-1">
-            <h4 className="text-xs font-semibold text-ink uppercase tracking-wider">Recommended Next Action</h4>
-            <p className="text-sm text-ink leading-relaxed">{triage.action_recommendation}</p>
+            <h4 className="text-xs font-semibold text-ink uppercase tracking-wider">
+              <Translate>Recommended Next Action</Translate>
+            </h4>
+            <p className="text-sm text-ink leading-relaxed">
+              <Translate>{triage.action_recommendation}</Translate>
+            </p>
           </div>
         </div>
         {triage.provider_guidance && (
           <p className="text-xs text-ink-soft pt-2 border-t border-black/5">
-            <strong>Clinical Guidance:</strong> {triage.provider_guidance}
+            <strong><Translate>Clinical Guidance</Translate>:</strong> <Translate>{triage.provider_guidance}</Translate>
           </p>
         )}
       </div>

@@ -72,7 +72,7 @@ export default function AssistantPage() {
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask a question about your report…"
+              placeholder={t('Ask a question about your report…')}
               className="focus-ring flex-1 rounded-full border border-ink/10 bg-porcelain-dim px-4 py-2.5 text-sm text-ink placeholder:text-ink-soft/60"
             />
             <button
