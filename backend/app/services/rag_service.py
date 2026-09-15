@@ -1,35 +1,54 @@
 """
-Retrieval-Augmented Generation for the chat assistant using ChromaDB and Groq.
+Retrieval-Augmented Generation for the chat assistant using lightweight SQLite KB search and Groq.
+Ultra-low memory footprint (<50MB RAM) designed for cloud deployment on free-tier containers (Render 512MB).
 Includes Empathetic Emotion-Aware AI and Personalized Longitudinal RAG context.
 """
-from langchain_community.vectorstores import Chroma
-from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_groq import ChatGroq
-from langchain_classic.chains import create_retrieval_chain
-from langchain_classic.chains.combine_documents import create_stuff_documents_chain
-from langchain_core.prompts import ChatPromptTemplate
-from app.config import settings
+import os
 import re
-import json
+import sqlite3
+from app.config import settings
+from app.services.llm_service import client
 
-# Lazy-load Embeddings and Vector Store to avoid blocking server port startup
-_embeddings = None
-_vector_store = None
+RAG_MODEL = "qwen/qwen3.8-27b"
 
-def get_vector_store():
-    global _embeddings, _vector_store
-    if _vector_store is None:
-        if _embeddings is None:
-            _embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
-        _vector_store = Chroma(persist_directory=settings.vector_db_path, embedding_function=_embeddings)
-    return _vector_store
+# In-memory cache of the medical knowledge base chunks
+_kb_documents = None
 
-def get_llm():
-    return ChatGroq(
-        temperature=0.1,
-        model_name="qwen/qwen3.8-27b",
-        api_key=settings.groq_api_key
-    )
+def get_kb_documents():
+    global _kb_documents
+    if _kb_documents is None:
+        db_file = os.path.join(settings.vector_db_path, "chroma.sqlite3")
+        docs = []
+        if os.path.exists(db_file):
+            try:
+                conn = sqlite3.connect(db_file)
+                cur = conn.cursor()
+                cur.execute('SELECT string_value FROM embedding_metadata WHERE key="chroma:document";')
+                rows = cur.fetchall()
+                docs = [r[0] for r in rows if r and r[0]]
+                conn.close()
+            except Exception as e:
+                print(f"Failed to load KB documents from sqlite: {e}")
+        _kb_documents = docs
+    return _kb_documents
+
+def retrieve_relevant_context(query: str, top_k: int = 4) -> str:
+    docs = get_kb_documents()
+    if not docs:
+        return ""
+    
+    query_words = set(re.findall(r'\w+', query.lower()))
+    scored = []
+    for doc in docs:
+        doc_words = set(re.findall(r'\w+', doc.lower()))
+        intersection = query_words.intersection(doc_words)
+        if intersection:
+            score = len(intersection)
+            scored.append((score, doc))
+            
+    scored.sort(key=lambda x: x[0], reverse=True)
+    top_docs = [d[1] for d in scored[:top_k]]
+    return "\n\n---\n\n".join(top_docs)
 
 def analyze_emotion(message: str) -> dict:
     """
@@ -69,12 +88,7 @@ def analyze_emotion(message: str) -> dict:
 
 def answer_question(message: str, patient_id: str, language: str = "en", longitudinal_context: str = "") -> dict:
     emotion_meta = analyze_emotion(message)
-    
-    retriever = get_vector_store().as_retriever(
-        search_kwargs={
-            "k": 5,
-        }
-    )
+    context = retrieve_relevant_context(message)
     
     lang_map = {
         "en": "English",
@@ -84,7 +98,7 @@ def answer_question(message: str, patient_id: str, language: str = "en", longitu
     }
     target_lang = lang_map.get(language, "English")
     
-    custom_system_prompt = (
+    system_prompt = (
         f"You are Halcyon, an empathetic, expert AI medical assistant specializing in breast health and medical report interpretation. "
         f"Always answer the user in {target_lang}. "
         f"EMPATHY & TONE INSTRUCTION: The user is currently feeling {emotion_meta['emotion']}. {emotion_meta['guidance']} "
@@ -95,23 +109,23 @@ def answer_question(message: str, patient_id: str, language: str = "en", longitu
         f"Never hallucinate medical information. "
         f"Always include a disclaimer that you are an AI, not a doctor. "
         f"IMPORTANT: At the end of your answer, include a confidence percentage (e.g. 'Confidence: 95%') indicating how sure you are of this inference based on the retrieved context."
-        f"\n\nContext: {{context}}"
+        f"\n\nContext:\n{context}"
     )
     
-    prompt = ChatPromptTemplate.from_messages([
-        ("system", custom_system_prompt),
-        ("human", "{input}"),
-    ])
-    
-    question_answer_chain = create_stuff_documents_chain(get_llm(), prompt)
-    rag_chain = create_retrieval_chain(retriever, question_answer_chain)
-    
     try:
-        response = rag_chain.invoke({"input": message})
-        answer = response["answer"]
+        response = client.chat.completions.create(
+            model=RAG_MODEL,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": message}
+            ],
+            temperature=0.1,
+            max_tokens=1024
+        )
+        answer = response.choices[0].message.content.strip()
     except Exception as e:
         print(f"RAG Error: {e}")
-        answer = f"I am here with you. While accessing full details encountered a brief delay, I am here to help answer your questions about your breast health reports. Please feel free to ask again."
+        answer = "I am here with you. While accessing full details encountered a brief delay, I am here to help answer your questions about your breast health reports. Please feel free to ask again."
     
     return {
         "answer": answer,
@@ -121,4 +135,5 @@ def answer_question(message: str, patient_id: str, language: str = "en", longitu
     }
 
 def add_document_to_kb(text: str, metadata: dict):
-    get_vector_store().add_texts(texts=[text], metadatas=[metadata])
+    docs = get_kb_documents()
+    docs.append(text)

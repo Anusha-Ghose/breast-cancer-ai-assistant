@@ -10,12 +10,6 @@ httpx
 pytesseract
 pillow
 pdf2image
-langchain
-langchain-community
-langchain-groq
-chromadb
-sentence-transformers
-spacy
 python-jose[cryptography]
 passlib[bcrypt]
 bcrypt
