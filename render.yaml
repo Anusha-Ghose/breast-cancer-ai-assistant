@@ -1,0 +1,35 @@
+services:
+  # 1. MongoDB Database (Private Service)
+  - type: pserv
+    name: mongo
+    env: image
+    image:
+      url: mongo:6.0
+    disk:
+      name: mongo-data
+      mountPath: /data/db
+      sizeGB: 1
+
+  # 2. Python Backend (Private Service)
+  - type: pserv
+    name: backend
+    env: docker
+    rootDir: backend
+    envVars:
+      - key: MONGO_URI
+        value: mongodb://mongo:27017/healthcare_assistant
+      - key: GROQ_API_KEY
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CORS_ORIGINS
+        value: '["*"]'
+
+  # 3. React Frontend with Nginx Proxy (Public Web Service)
+  - type: web
+    name: frontend
+    env: docker
+    rootDir: frontend
+    envVars:
+      - key: PORT
+        value: 80
