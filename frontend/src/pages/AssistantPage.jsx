@@ -26,7 +26,7 @@ export default function AssistantPage() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl px-6 py-16">
+    <div className="mx-auto max-w-[1400px] px-6 sm:px-8 lg:px-12 py-16">
       <p className="text-sm font-medium uppercase tracking-widest text-rose-600"><Translate>AI assistant</Translate></p>
       <h1 className="mt-2 font-display text-3xl text-ink"><Translate>Ask about your reports</Translate></h1>
       <p className="mt-2 flex items-center gap-1.5 text-sm text-ink-soft">

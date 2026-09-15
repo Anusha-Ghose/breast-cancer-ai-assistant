@@ -7,6 +7,7 @@ import ReportInsightsPage from './pages/ReportInsightsPage.jsx'
 import TrendsPage from './pages/TrendsPage.jsx'
 import AssistantPage from './pages/AssistantPage.jsx'
 import HistoryPage from './pages/HistoryPage.jsx'
+import TreatmentJourneyPage from './pages/TreatmentJourneyPage.jsx'
 
 export default function App() {
   return (
@@ -18,6 +19,7 @@ export default function App() {
           <Route path="/upload" element={<UploadPage />} />
           <Route path="/report" element={<ReportInsightsPage />} />
           <Route path="/trends" element={<TrendsPage />} />
+          <Route path="/sandbox" element={<TreatmentJourneyPage />} />
           <Route path="/assistant" element={<AssistantPage />} />
           <Route path="/history" element={<HistoryPage />} />
         </Routes>

@@ -1,5 +1,6 @@
 """
 Structured medical entity extraction from raw OCR text using LangChain and Groq.
+Includes handwritten prescription reading and MTS Triage indicators.
 """
 from typing import List, Optional
 from pydantic import BaseModel, Field
@@ -12,6 +13,8 @@ class Medicine(BaseModel):
     dosage: Optional[str] = None
     frequency: Optional[str] = None
     duration: Optional[str] = None
+    sig: Optional[str] = Field(default=None, description="Patient directions / instructions (e.g. Take 1 tablet by mouth twice daily after meals)")
+    refills: Optional[str] = Field(default=None, description="Number of authorized refills")
     confidence_score: Optional[int] = Field(default=None, description="Confidence percentage (0-100) of this extraction")
 
 class LabParameter(BaseModel):
@@ -34,6 +37,9 @@ class ExtractedEntities(BaseModel):
     report_date: Optional[str] = None
     hospital: Optional[str] = None
     doctor_name: Optional[str] = None
+    prescribing_doctor: Optional[str] = None
+    is_handwritten_prescription: Optional[bool] = Field(default=False, description="True if document is a handwritten physician prescription")
+    handwritten_confidence_score: Optional[int] = Field(default=None, description="Confidence percentage (0-100) in reading handwritten text")
     diagnosis: Optional[List[str]] = []
     symptoms: Optional[List[str]] = []
     medicines: Optional[List[Medicine]] = []
@@ -55,14 +61,17 @@ async def extract_entities(raw_text: str, document_type: str) -> dict:
     structured_llm = llm.with_structured_output(ExtractedEntities)
     
     prompt = f"""
-    You are an expert medical data extractor. Your task is to accurately extract ALL relevant patient and clinical information from the provided medical document text.
-    - Extract the patient's demographics, hospital, doctor name, diagnoses, symptoms, medications, lab parameters, and recommendations.
-    - If a specific field is not found in the text, leave it empty or null. Do NOT invent information.
-    - Note: The 'Document Type' provided below is what the user selected, but the actual text may contain different information (e.g. a blood test uploaded as a mammogram). Always trust the TEXT over the Document Type.
+    You are an expert clinical data and handwritten prescription extractor. Your task is to accurately extract ALL patient, diagnostic, and prescription information from the provided medical document text.
+    
+    SPECIAL HANDWRITTEN PRESCRIPTION INSTRUCTION:
+    - If the Document Type is 'handwritten_prescription' or the text contains physician prescription patterns (Rx, Sig, Disp, Refill, dosage frequencies like BID/TID/QID/PRN):
+      - Set `is_handwritten_prescription` to True.
+      - Carefully decode medicine names (e.g. Tamoxifen, Letrozole, Anastrozole, Ondansetron, Paclitaxel, Cyclophosphamide).
+      - Extract the dosage (e.g., 20mg, 2.5mg, 4mg), frequency (e.g., once daily, twice daily after meals), duration (e.g., 30 days, 5 years), and full `sig` instructions.
+      - Provide a `handwritten_confidence_score` (0-100) for how clearly the handwriting was parsed.
     
     CRITICAL: Carefully read through the medical document and identify any complex medical jargon or terminology (e.g. "ER-positive", "HER2/neu", "carcinoma"). 
-    For each complex term you find, provide the term, a simple, plain-English explanation for a patient without medical training in the `complex_terminologies` field, and a `confidence_score` (0-100) indicating how sure you are of the explanation based on the context.
-    Also provide a `confidence_score` (0-100) for all extracted medicines and lab parameters, and a `summary_confidence_score` (0-100) for the overall diagnosis and symptoms extraction.
+    For each complex term you find, provide the term, a simple, plain-English explanation for a patient without medical training in the `complex_terminologies` field, and a `confidence_score` (0-100).
 
     Document Type: {document_type}
     

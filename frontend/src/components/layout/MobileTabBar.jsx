@@ -1,11 +1,11 @@
 import { NavLink } from 'react-router-dom'
-import { Home, Upload, FileText, TrendingUp, MessageCircle, Clock } from 'lucide-react'
+import { Home, Upload, Compass, TrendingUp, MessageCircle, Clock } from 'lucide-react'
 import Translate from '../common/Translate.jsx'
 
 const TABS = [
   { to: '/', label: 'Home', icon: Home },
   { to: '/upload', label: 'Upload', icon: Upload },
-  { to: '/history', label: 'History', icon: Clock },
+  { to: '/sandbox', label: 'Sandbox', icon: Compass },
   { to: '/trends', label: 'Trends', icon: TrendingUp },
   { to: '/assistant', label: 'Chat', icon: MessageCircle },
 ]

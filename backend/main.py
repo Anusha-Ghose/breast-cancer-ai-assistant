@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
 from app.db.database import connect_to_mongo, close_mongo_connection
-from app.api import routes_auth, routes_upload, routes_reports, routes_trends, routes_chat, routes_translate
+from app.api import routes_auth, routes_upload, routes_reports, routes_trends, routes_chat, routes_translate, routes_sandbox, routes_triage
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -18,15 +18,15 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="Multimodal AI Healthcare Assistant API",
-    description="OCR + NLP + LLM pipeline for medical report analysis",
-    version="1.0.0",
+    description="OCR + NLP + LLM pipeline for medical report analysis & clinical decision support",
+    version="2.0.0",
     lifespan=lifespan
 )
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.cors_origins,
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -37,7 +37,8 @@ app.include_router(routes_reports.router, prefix="/api/reports", tags=["reports"
 app.include_router(routes_trends.router, prefix="/api/trends", tags=["trends"])
 app.include_router(routes_chat.router, prefix="/api/chat", tags=["chat"])
 app.include_router(routes_translate.router, prefix="/api/translate", tags=["translate"])
-
+app.include_router(routes_sandbox.router, prefix="/api/sandbox", tags=["sandbox"])
+app.include_router(routes_triage.router, prefix="/api/triage", tags=["triage"])
 
 @app.get("/api/health")
 def health_check():

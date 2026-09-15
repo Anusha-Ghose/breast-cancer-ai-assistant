@@ -12,6 +12,7 @@ const NAV_ITEMS = [
   { to: '/upload', label: 'Upload' },
   { to: '/report', label: 'Report insights' },
   { to: '/trends', label: 'Trends' },
+  { to: '/sandbox', label: 'Treatment Sandbox' },
   { to: '/assistant', label: 'Assistant' },
   { to: '/history', label: 'History' },
 ]
@@ -25,7 +26,7 @@ export default function Navbar() {
   return (
     <>
       <header className="sticky top-0 z-40 border-b border-ink/5 bg-porcelain/90 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+        <div className="mx-auto flex max-w-[1600px] items-center justify-between px-6 sm:px-8 lg:px-12 py-4">
           <div className="flex items-center gap-2">
             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-rose-500 text-white">
               <Ribbon size={18} strokeWidth={2} />

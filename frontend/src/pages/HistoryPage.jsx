@@ -57,7 +57,7 @@ export default function HistoryPage() {
   }
 
   return (
-    <div className="mx-auto max-w-4xl px-6 py-16">
+    <div className="mx-auto max-w-[1600px] px-6 sm:px-8 lg:px-12 py-16">
       <div className="mb-8">
         <p className="text-sm font-medium uppercase tracking-widest text-rose-600 flex items-center gap-2">
           <Clock size={16} /> <Translate>Your Activity</Translate>

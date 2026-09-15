@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from app.services import rag_service
 from app.core.security import get_current_user_id
+from app.db.database import db
 
 router = APIRouter()
 
@@ -13,7 +14,30 @@ class ChatRequest(BaseModel):
 @router.post("")
 async def chat(payload: ChatRequest, user_id: str = Depends(get_current_user_id)):
     """
-    Retrieves relevant passages and generates a grounded answer via LLM.
+    Retrieves relevant passages, performs emotion/sentiment detection, compiles longitudinal history,
+    and generates an empathetic, context-aware answer via LLM.
     """
-    answer = rag_service.answer_question(payload.message, patient_id=user_id, language=payload.language)
-    return {"answer": answer, "grounded": True}
+    longitudinal_summary = ""
+    try:
+        cursor = db.db.reports.find({"patient_id": user_id}).sort("upload_date", 1)
+        reports = await cursor.to_list(length=10)
+        if reports:
+            summary_items = []
+            for r in reports:
+                date = str(r.get("upload_date", "")).split()[0]
+                doc_type = r.get("document_type", "report")
+                entities = r.get("extracted_entities", {})
+                diag = ", ".join(entities.get("diagnosis", [])) or "Routine evaluation"
+                summary_items.append(f"- Date: {date} | Type: {doc_type} | Findings: {diag}")
+            longitudinal_summary = "\n".join(summary_items)
+    except Exception as e:
+        print(f"Error fetching longitudinal history: {e}")
+
+    result = rag_service.answer_question(
+        message=payload.message,
+        patient_id=user_id,
+        language=payload.language or "en",
+        longitudinal_context=longitudinal_summary
+    )
+    
+    return result

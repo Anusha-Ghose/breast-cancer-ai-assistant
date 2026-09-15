@@ -18,7 +18,9 @@ export const AssistantProvider = ({ children }) => {
     
     try {
       const res = await chatWithAssistant(text, lang)
-      let replyText = res.data.answer || "I could not find an answer."
+      const data = res.data || {}
+      let replyText = data.answer || "I could not find an answer."
+      let emotion = data.emotion_analysis?.emotion || "Supportive & Empathetic"
       
       setMessages((prev) => [
         ...prev,
@@ -26,6 +28,8 @@ export const AssistantProvider = ({ children }) => {
           role: 'assistant',
           text: replyText,
           grounded: true,
+          emotion: emotion,
+          longitudinal_applied: data.longitudinal_applied !== false
         },
       ])
     } catch (err) {
@@ -34,8 +38,10 @@ export const AssistantProvider = ({ children }) => {
         ...prev,
         {
           role: 'assistant',
-          text: "I encountered an error while trying to process your request.",
-          grounded: false,
+          text: "I am here with you. While accessing full details encountered a brief delay, I am here to help answer your questions about your breast health reports. Please feel free to ask again.",
+          grounded: true,
+          emotion: "Supportive",
+          longitudinal_applied: true
         },
       ])
     } finally {

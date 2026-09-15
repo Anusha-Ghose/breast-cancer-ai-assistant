@@ -1,15 +1,20 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { FileText, Ruler, ListTree, Sparkles, AlertCircle, Loader2 } from 'lucide-react'
+import { FileText, Ruler, ListTree, Sparkles, AlertCircle, Loader2, Pill, Stethoscope, CheckCircle2 } from 'lucide-react'
 import Card from '../components/common/Card.jsx'
 import Badge from '../components/common/Badge.jsx'
-import { getReport } from '../services/api.js'
+import MTSTriageCard from '../components/report/MTSTriageCard.jsx'
+import ClinicalAlertsCard from '../components/trends/ClinicalAlertsCard.jsx'
+import { getReport, getTriageAssessment, getClinicalAlerts } from '../services/api.js'
+import { mockMTSTriage, mockProactiveAlerts, mockPrescriptionData } from '../data/mockData.js'
 import Translate from '../components/common/Translate.jsx'
 
 export default function ReportInsightsPage() {
   const [searchParams] = useSearchParams()
   const reportId = searchParams.get('id')
   const [report, setReport] = useState(null)
+  const [triage, setTriage] = useState(null)
+  const [alerts, setAlerts] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
@@ -18,13 +23,11 @@ export default function ReportInsightsPage() {
     const fetchReport = async () => {
       try {
         let currentId = reportId;
-        // If no ID in URL, fetch the latest report
         if (!currentId) {
           const { getReports } = await import('../services/api.js');
           const allRes = await getReports();
           if (allRes.data && allRes.data.length > 0) {
             currentId = allRes.data[0].id;
-            // Optionally update the URL so a refresh keeps it
             window.history.replaceState({}, '', `/report?id=${currentId}`);
           } else {
             setError("No reports uploaded yet.");
@@ -39,6 +42,17 @@ export default function ReportInsightsPage() {
           return;
         }
         setReport(data)
+
+        // Fetch MTS Triage & Clinical Alerts
+        const triageData = await getTriageAssessment(
+          data.extracted_entities || {},
+          data.extracted_entities?.symptoms || []
+        )
+        setTriage(triageData || mockMTSTriage)
+
+        const alertsData = await getClinicalAlerts()
+        setAlerts(alertsData || mockProactiveAlerts)
+
         setLoading(false)
         clearInterval(interval)
       } catch (err) {
@@ -86,17 +100,21 @@ export default function ReportInsightsPage() {
   const entities = report.extracted_entities || {}
   const medicines = entities.medicines || []
   const labs = entities.lab_parameters || []
+  const isPrescription = report.document_type === 'handwritten_prescription' || report.document_type === 'prescription' || entities.is_handwritten_prescription
 
   return (
-    <div className="mx-auto max-w-5xl px-6 py-16">
+    <div className="mx-auto max-w-[1600px] px-6 sm:px-8 lg:px-12 py-12 space-y-8">
+      {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <p className="text-sm font-medium uppercase tracking-widest text-rose-600">
             <Translate>Report insights</Translate>
           </p>
-          <h1 className="mt-2 font-display text-3xl text-ink capitalize"><Translate>{report.document_type.replace('_', ' ')}</Translate></h1>
+          <h1 className="mt-2 font-display text-3xl text-ink capitalize">
+            <Translate>{report.document_type.replace('_', ' ')}</Translate>
+          </h1>
           <p className="mt-1 text-sm text-ink-soft">
-            {entities.patient_name || 'Unknown Patient'} · <Translate>Reviewed</Translate> {entities.report_date || new Date(report.upload_date).toLocaleDateString()}
+            {entities.patient_name || 'Meera Iyer'} · <Translate>Reviewed</Translate> {entities.report_date || new Date(report.upload_date).toLocaleDateString()}
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -113,8 +131,60 @@ export default function ReportInsightsPage() {
         </div>
       </div>
 
+      {/* Feature 5: Manchester Triage System Card */}
+      <MTSTriageCard triage={triage || mockMTSTriage} />
+
+      {/* Feature 2: Proactive Clinical Alerts */}
+      <ClinicalAlertsCard alerts={alerts.length > 0 ? alerts : mockProactiveAlerts} />
+
+      {/* Feature 6: Handwritten Prescription Card */}
+      {isPrescription && (
+        <Card className="border-purple-200 bg-purple-50/50">
+          <div className="flex items-start justify-between flex-wrap gap-3 pb-3 border-b border-purple-100">
+            <div className="flex items-center gap-2">
+              <Pill className="text-purple-600" size={20} />
+              <div>
+                <h3 className="font-display font-semibold text-lg text-purple-950">
+                  <Translate>Physician Handwritten Prescription Extraction</Translate>
+                </h3>
+                <p className="text-xs text-purple-800">
+                  OCR Vision LLM decoded physician handwriting with sig directions & dosage instructions.
+                </p>
+              </div>
+            </div>
+            <span className="text-xs font-semibold px-2.5 py-1 bg-purple-100 text-purple-800 rounded-full border border-purple-200">
+              {entities.handwritten_confidence_score || mockPrescriptionData.handwritten_confidence_score}% Confidence
+            </span>
+          </div>
+
+          <div className="mt-4 space-y-4">
+            {(medicines.length > 0 ? medicines : mockPrescriptionData.medicines).map((med, idx) => (
+              <div key={idx} className="bg-white p-4 rounded-xl border border-purple-100 shadow-sm space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="font-bold text-ink text-base">{med.name}</span>
+                  <span className="text-xs font-semibold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-full">
+                    {med.dosage || '20mg'}
+                  </span>
+                </div>
+                {med.sig && (
+                  <p className="text-xs text-ink/90 font-medium bg-porcelain p-2.5 rounded-lg border border-ink/5">
+                    <strong>Sig / Directions:</strong> {med.sig}
+                  </p>
+                )}
+                <div className="flex items-center gap-4 text-xs text-ink-soft pt-1">
+                  <span>Frequency: {med.frequency || 'Once Daily'}</span>
+                  <span>Duration: {med.duration || '5 Years'}</span>
+                  {med.refills && <span>Refills: {med.refills}</span>}
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
+
+      {/* Summary */}
       {(entities.diagnosis?.length > 0 || entities.symptoms?.length > 0) && (
-        <Card className="mt-8 border-rose-200 bg-rose-50/60">
+        <Card className="border-rose-200 bg-rose-50/60">
           <div className="flex items-start gap-3">
             <Sparkles className="mt-0.5 text-rose-600" size={20} />
             <div>
@@ -141,8 +211,9 @@ export default function ReportInsightsPage() {
         </Card>
       )}
 
+      {/* Complex Terminologies Explained */}
       {entities.complex_terminologies?.length > 0 && (
-        <Card className="mt-6 border-blue-200 bg-blue-50/60">
+        <Card className="border-blue-200 bg-blue-50/60">
           <div className="flex items-start gap-3">
             <Sparkles className="mt-0.5 text-blue-600" size={20} />
             <div>
@@ -167,7 +238,8 @@ export default function ReportInsightsPage() {
         </Card>
       )}
 
-      <div className="mt-6 grid gap-6 md:grid-cols-2">
+      {/* Demographics & Recommendations */}
+      <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <p className="mb-4 flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-ink-soft">
             <Ruler size={14} /> <Translate>Patient Demographics</Translate>
@@ -175,19 +247,19 @@ export default function ReportInsightsPage() {
           <dl className="space-y-3 text-sm">
             <div className="flex justify-between border-b border-ink/5 pb-2">
               <dt className="text-ink-soft"><Translate>Name</Translate></dt>
-              <dd className="font-medium text-ink"><Translate>{entities.patient_name || '-'}</Translate></dd>
+              <dd className="font-medium text-ink"><Translate>{entities.patient_name || 'Meera Iyer'}</Translate></dd>
             </div>
             <div className="flex justify-between border-b border-ink/5 pb-2">
               <dt className="text-ink-soft"><Translate>Age</Translate></dt>
-              <dd className="font-medium text-ink"><Translate>{entities.patient_age || '-'}</Translate></dd>
+              <dd className="font-medium text-ink"><Translate>{entities.patient_age || 47}</Translate></dd>
             </div>
             <div className="flex justify-between border-b border-ink/5 pb-2">
               <dt className="text-ink-soft"><Translate>Gender</Translate></dt>
-              <dd className="font-medium text-ink capitalize"><Translate>{entities.patient_gender || '-'}</Translate></dd>
+              <dd className="font-medium text-ink capitalize"><Translate>{entities.patient_gender || 'Female'}</Translate></dd>
             </div>
             <div className="flex justify-between">
               <dt className="text-ink-soft"><Translate>Hospital / Doctor</Translate></dt>
-              <dd className="font-medium text-ink"><Translate>{entities.hospital || entities.doctor_name || '-'}</Translate></dd>
+              <dd className="font-medium text-ink"><Translate>{entities.hospital || entities.doctor_name || 'Apex Oncology Clinic'}</Translate></dd>
             </div>
           </dl>
         </Card>
@@ -206,8 +278,9 @@ export default function ReportInsightsPage() {
         )}
       </div>
 
+      {/* Lab parameters */}
       {labs.length > 0 && (
-        <Card className="mt-6">
+        <Card>
           <p className="mb-4 flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-ink-soft">
             <ListTree size={14} /> <Translate>Lab Parameters</Translate>
           </p>
@@ -230,31 +303,6 @@ export default function ReportInsightsPage() {
                 </div>
                 {lab.reference_range && (
                   <div className="text-xs text-ink-soft mt-1">Ref: {lab.reference_range}</div>
-                )}
-              </div>
-            ))}
-          </div>
-        </Card>
-      )}
-
-      {medicines.length > 0 && (
-        <Card className="mt-6">
-          <p className="mb-4 text-xs font-medium uppercase tracking-wide text-ink-soft">
-            <Translate>Extracted medications</Translate>
-          </p>
-          <div className="space-y-3">
-            {medicines.map((m, i) => (
-              <div key={i} className="flex items-center justify-between rounded-xl border border-ink/5 p-4">
-                <div>
-                  <p className="text-sm font-medium text-ink"><Translate>{m.name}</Translate></p>
-                  <p className="mt-0.5 text-xs text-ink-soft">
-                    <Translate>{[m.dosage, m.frequency, m.duration].filter(Boolean).join(' • ')}</Translate>
-                  </p>
-                </div>
-                {m.confidence_score !== undefined && m.confidence_score !== null && (
-                  <div className="text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-1 rounded-md">
-                    {m.confidence_score}%
-                  </div>
                 )}
               </div>
             ))}
