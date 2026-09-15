@@ -12,15 +12,24 @@ from app.config import settings
 import re
 import json
 
-# Initialize Embeddings and Vector Store
-embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
-vector_store = Chroma(persist_directory=settings.vector_db_path, embedding_function=embeddings)
+# Lazy-load Embeddings and Vector Store to avoid blocking server port startup
+_embeddings = None
+_vector_store = None
 
-llm = ChatGroq(
-    temperature=0.1,
-    model_name="qwen/qwen3.8-27b",
-    api_key=settings.groq_api_key
-)
+def get_vector_store():
+    global _embeddings, _vector_store
+    if _vector_store is None:
+        if _embeddings is None:
+            _embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+        _vector_store = Chroma(persist_directory=settings.vector_db_path, embedding_function=_embeddings)
+    return _vector_store
+
+def get_llm():
+    return ChatGroq(
+        temperature=0.1,
+        model_name="qwen/qwen3.8-27b",
+        api_key=settings.groq_api_key
+    )
 
 def analyze_emotion(message: str) -> dict:
     """
@@ -61,7 +70,7 @@ def analyze_emotion(message: str) -> dict:
 def answer_question(message: str, patient_id: str, language: str = "en", longitudinal_context: str = "") -> dict:
     emotion_meta = analyze_emotion(message)
     
-    retriever = vector_store.as_retriever(
+    retriever = get_vector_store().as_retriever(
         search_kwargs={
             "k": 5,
         }
@@ -94,7 +103,7 @@ def answer_question(message: str, patient_id: str, language: str = "en", longitu
         ("human", "{input}"),
     ])
     
-    question_answer_chain = create_stuff_documents_chain(llm, prompt)
+    question_answer_chain = create_stuff_documents_chain(get_llm(), prompt)
     rag_chain = create_retrieval_chain(retriever, question_answer_chain)
     
     try:
@@ -112,4 +121,4 @@ def answer_question(message: str, patient_id: str, language: str = "en", longitu
     }
 
 def add_document_to_kb(text: str, metadata: dict):
-    vector_store.add_texts(texts=[text], metadatas=[metadata])
+    get_vector_store().add_texts(texts=[text], metadatas=[metadata])
