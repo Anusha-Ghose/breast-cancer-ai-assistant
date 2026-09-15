@@ -18,7 +18,7 @@ vector_store = Chroma(persist_directory=settings.vector_db_path, embedding_funct
 
 llm = ChatGroq(
     temperature=0.1,
-    model_name="llama-3.3-70b-versatile",
+    model_name="openai/gpt-oss-20b",
     api_key=settings.groq_api_key
 )
 

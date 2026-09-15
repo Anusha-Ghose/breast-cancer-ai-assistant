@@ -48,7 +48,7 @@ export default function UploadPage() {
 
       {error && (
         <div className="mt-4 p-4 bg-red-50 text-red-600 rounded-2xl border border-red-100 text-sm">
-          {error}
+          <Translate>{error}</Translate>
         </div>
       )}
 

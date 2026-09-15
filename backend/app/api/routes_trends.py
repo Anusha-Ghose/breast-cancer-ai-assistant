@@ -77,7 +77,7 @@ async def compare_reports(id1: str, id2: str, language: str = "en", user_id: str
     
     llm = ChatGroq(
         temperature=0,
-        model_name="llama-3.3-70b-versatile",
+        model_name="openai/gpt-oss-20b",
         api_key=settings.groq_api_key
     )
     
@@ -131,7 +131,10 @@ async def compare_reports(id1: str, id2: str, language: str = "en", user_id: str
         summary: str = Field(description="A 2-sentence overarching summary of the comparison")
         confidence_score: int = Field(description="Confidence percentage (0-100) of this comparison summary")
         
-    structured_llm = llm.with_structured_output(ComparisonOutput)
+    from langchain_core.output_parsers import JsonOutputParser
+    from langchain_core.prompts import PromptTemplate
+    
+    parser = JsonOutputParser(pydantic_object=ComparisonOutput)
     
     lang_map = {
         "en": "English",
@@ -141,26 +144,32 @@ async def compare_reports(id1: str, id2: str, language: str = "en", user_id: str
     }
     target_lang = lang_map.get(language, "English")
     
-    prompt = f"""
-    You are a helpful medical assistant. Compare these two medical reports and explain the changes in simple language for the patient.
+    prompt = PromptTemplate(
+        template="""You are a helpful medical assistant. Compare these two medical reports and explain the changes in simple language for the patient.
+        
+        IMPORTANT INSTRUCTION: You MUST write all your insights and the final summary entirely in {target_lang}.
+        CRITICAL INSTRUCTION FOR MEDICAL TERMS: Do not try to translate complex medical terms (like 'Hemoglobin', 'Ki-67'). Instead, transliterate them (write them in the literal spelling/script of {target_lang}, matching the English pronunciation).
+        
+        Here is the calculated chart data showing changes in their lab parameters:
+        {chart_data}
+        
+        1. Identify any significant or meaningful changes from the chart data and provide a short, patient-friendly insight for it in {target_lang}.
+        2. Provide a brief 2-sentence summary of the overall comparison in {target_lang}, noting if things are generally stable, improving, or require attention.
+        3. Provide an overall confidence_score (0-100) indicating how sure you are of these conclusions based on the data provided.
+        
+        {format_instructions}""",
+        input_variables=["target_lang", "chart_data"],
+        partial_variables={"format_instructions": parser.get_format_instructions()}
+    )
     
-    IMPORTANT INSTRUCTION: You MUST write all your insights and the final summary entirely in {target_lang}.
-    CRITICAL INSTRUCTION FOR MEDICAL TERMS: Do not try to translate complex medical terms (like 'Hemoglobin', 'Ki-67'). Instead, transliterate them (write them in the literal spelling/script of {target_lang}, matching the English pronunciation).
-    
-    Here is the calculated chart data showing changes in their lab parameters:
-    {chart_data}
-    
-    1. Identify any significant or meaningful changes from the chart data and provide a short, patient-friendly insight for it in {target_lang}.
-    2. Provide a brief 2-sentence summary of the overall comparison in {target_lang}, noting if things are generally stable, improving, or require attention.
-    3. Provide an overall confidence_score (0-100) indicating how sure you are of these conclusions based on the data provided.
-    """
+    chain = prompt | llm | parser
     
     try:
         if len(chart_data) > 0:
-            result = structured_llm.invoke(prompt)
-            insights = result.model_dump()["insights"]
-            summary = result.summary
-            confidence_score = result.confidence_score
+            result = chain.invoke({"target_lang": target_lang, "chart_data": chart_data})
+            insights = result.get("insights", [])
+            summary = result.get("summary", "")
+            confidence_score = result.get("confidence_score")
         else:
             insights = []
             summary = "No common numerical lab parameters found to compare between these reports."

@@ -120,15 +120,15 @@ export default function LandingPage() {
           <div className="pt-4 border-t border-ink/5 flex flex-wrap items-center gap-6 text-xs text-ink-soft">
             <div className="flex items-center gap-1.5">
               <Lock size={14} className="text-emerald-600" />
-              <span>100% Private & Encrypted</span>
+              <span><Translate>100% Private & Encrypted</Translate></span>
             </div>
             <div className="flex items-center gap-1.5">
               <ShieldCheck size={14} className="text-rose-600" />
-              <span>Literature-Grounded Evidence</span>
+              <span><Translate>Literature-Grounded Evidence</Translate></span>
             </div>
             <div className="flex items-center gap-1.5">
               <Activity size={14} className="text-blue-600" />
-              <span>Manchester Triage Ready</span>
+              <span><Translate>Manchester Triage Ready</Translate></span>
             </div>
           </div>
         </div>
@@ -148,7 +148,7 @@ export default function LandingPage() {
                 </div>
                 <span className="px-2.5 py-1 text-[11px] font-bold rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
                   <CheckCircle2 size={12} />
-                  Verified
+                  <Translate>Verified</Translate>
                 </span>
               </div>
 
@@ -164,7 +164,7 @@ export default function LandingPage() {
                       <Translate>Positive · 92% nuclear staining</Translate>
                     </p>
                     <span className="inline-block text-[10px] font-medium text-emerald-700 bg-emerald-100/60 px-2 py-0.5 rounded">
-                      High Treatment Sensitivity
+                      <Translate>High Treatment Sensitivity</Translate>
                     </span>
                   </div>
                 </div>
@@ -179,7 +179,7 @@ export default function LandingPage() {
                       <Translate>Intermediate (22%) · Cellular Growth Rate</Translate>
                     </p>
                     <span className="inline-block text-[10px] font-medium text-amber-700 bg-amber-100/60 px-2 py-0.5 rounded">
-                      Discuss Follow-up with Doctor
+                      <Translate>Discuss Follow-up with Doctor</Translate>
                     </span>
                   </div>
                 </div>
@@ -189,7 +189,7 @@ export default function LandingPage() {
               <div className="rounded-xl bg-rose-50/70 p-4 border border-rose-100 text-xs text-rose-950 leading-relaxed space-y-1">
                 <div className="font-semibold flex items-center gap-1.5 text-rose-800">
                   <HeartHandshake size={14} />
-                  <span>Plain-Language Summary:</span>
+                  <span><Translate>Plain-Language Summary:</Translate></span>
                 </div>
                 <p>
                   <Translate>
@@ -202,9 +202,9 @@ export default function LandingPage() {
               <div className="flex items-center justify-between text-[11px] text-ink-soft pt-1 border-t border-ink/5">
                 <span className="flex items-center gap-1 text-amber-700 font-medium">
                   <span className="w-2 h-2 rounded-full bg-amber-500 inline-block" />
-                  MTS Triage: Urgent (Category 3)
+                  <Translate>MTS Triage: Urgent (Category 3)</Translate>
                 </span>
-                <span className="text-ink-soft">Grounded in ASCO 2024</span>
+                <span className="text-ink-soft"><Translate>Grounded in ASCO 2024</Translate></span>
               </div>
             </Card>
           </div>
@@ -216,9 +216,9 @@ export default function LandingPage() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
           {STATS.map((stat, idx) => (
             <div key={idx} className="space-y-1">
-              <div className="font-display text-2xl sm:text-3xl font-bold text-ink">{stat.value}</div>
-              <div className="text-xs font-semibold text-ink uppercase tracking-wider">{stat.label}</div>
-              <div className="text-[11px] text-ink-soft">{stat.hint}</div>
+              <div className="font-display text-2xl sm:text-3xl font-bold text-ink"><Translate>{stat.value}</Translate></div>
+              <div className="text-xs font-semibold text-ink uppercase tracking-wider"><Translate>{stat.label}</Translate></div>
+              <div className="text-[11px] text-ink-soft"><Translate>{stat.hint}</Translate></div>
             </div>
           ))}
         </div>
@@ -245,13 +245,13 @@ export default function LandingPage() {
       <section className="space-y-8 pt-4">
         <div className="text-center max-w-2xl mx-auto space-y-2">
           <span className="text-xs font-semibold uppercase tracking-widest text-rose-600 bg-rose-50 px-3 py-1 rounded-full border border-rose-100 inline-block">
-            Advanced Clinical AI Suite
+            <Translate>Advanced Clinical AI Suite</Translate>
           </span>
           <h2 className="font-display text-2xl sm:text-3xl font-bold text-ink">
-            Built for Clinical Decision Support & Patient Empathy
+            <Translate>Built for Clinical Decision Support & Patient Empathy</Translate>
           </h2>
           <p className="text-sm text-ink-soft">
-            Combining multimodal OCR, emotion-aware reasoning, and Manchester clinical triage to empower patients and assist healthcare teams.
+            <Translate>Combining multimodal OCR, emotion-aware reasoning, and Manchester clinical triage to empower patients and assist healthcare teams.</Translate>
           </p>
         </div>
 
@@ -261,8 +261,8 @@ export default function LandingPage() {
               <div className={`w-10 h-10 rounded-xl border flex items-center justify-center ${color}`}>
                 <Icon size={20} />
               </div>
-              <h3 className="font-display font-semibold text-base text-ink">{title}</h3>
-              <p className="text-xs text-ink-soft leading-relaxed">{desc}</p>
+              <h3 className="font-display font-semibold text-base text-ink"><Translate>{title}</Translate></h3>
+              <p className="text-xs text-ink-soft leading-relaxed"><Translate>{desc}</Translate></p>
             </div>
           ))}
         </div>

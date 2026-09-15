@@ -224,7 +224,7 @@ export default function TreatmentJourneyPage() {
               >
                 <div className="text-sm">{key}</div>
                 <div className="text-xs text-ink-soft mt-1 font-normal line-clamp-1">
-                  {key === 'HR+/HER2-' ? 'Hormone Receptor +' : key === 'HER2+' ? 'HER2 Amplified' : 'Triple Negative'}
+                  <Translate>{key === 'HR+/HER2-' ? 'Hormone Receptor +' : key === 'HER2+' ? 'HER2 Amplified' : 'Triple Negative'}</Translate>
                 </div>
               </button>
             ))}
@@ -241,10 +241,10 @@ export default function TreatmentJourneyPage() {
             onChange={(e) => setStage(e.target.value)}
             className="w-full p-3 bg-porcelain border border-ink/10 rounded-xl text-ink font-medium focus:outline-none focus:ring-2 focus:ring-rose-500/20"
           >
-            <option value="Stage I">Stage I (Early Localized)</option>
-            <option value="Stage II">Stage II (Localized / Regional Nodes)</option>
-            <option value="Stage III">Stage III (Locally Advanced)</option>
-            <option value="Stage IV">Stage IV (Advanced / Metastatic)</option>
+            <option value="Stage I"><Translate>Stage I (Early Localized)</Translate></option>
+            <option value="Stage II"><Translate>Stage II (Localized / Regional Nodes)</Translate></option>
+            <option value="Stage III"><Translate>Stage III (Locally Advanced)</Translate></option>
+            <option value="Stage IV"><Translate>Stage IV (Advanced / Metastatic)</Translate></option>
           </select>
         </div>
       </div>
@@ -253,9 +253,9 @@ export default function TreatmentJourneyPage() {
       <div className="bg-white rounded-2xl p-6 border border-ink/10 shadow-sm space-y-4">
         <h3 className="font-display font-semibold text-lg text-ink flex items-center gap-2">
           <Stethoscope size={20} className="text-rose-500" />
-          {currentPathway.title}
+          <Translate>{currentPathway.title}</Translate>
         </h3>
-        <p className="text-sm text-ink-soft leading-relaxed">{currentPathway.description}</p>
+        <p className="text-sm text-ink-soft leading-relaxed"><Translate>{currentPathway.description}</Translate></p>
 
         <div className="pt-4 border-t border-ink/5">
           <h4 className="text-xs font-semibold text-ink-soft uppercase tracking-wider mb-3">
@@ -267,7 +267,7 @@ export default function TreatmentJourneyPage() {
                 <span className="w-5 h-5 bg-rose-500 text-white rounded-full flex items-center justify-center font-bold text-[10px] shrink-0">
                   {idx + 1}
                 </span>
-                <span className="line-clamp-2">{seq.replace(/^\d+\.\s*/, '')}</span>
+                <span className="line-clamp-2"><Translate>{seq.replace(/^\d+\.\s*/, '')}</Translate></span>
               </div>
             ))}
           </div>
@@ -291,11 +291,11 @@ export default function TreatmentJourneyPage() {
                   : 'border-ink/10 bg-white/70 hover:bg-white text-ink-soft hover:text-ink'
               }`}
             >
-              <div className="text-xs font-semibold text-rose-500">{step.phase}</div>
-              <div className="font-display font-semibold text-sm text-ink mt-1">{step.title}</div>
+              <div className="text-xs font-semibold text-rose-500"><Translate>{step.phase}</Translate></div>
+              <div className="font-display font-semibold text-sm text-ink mt-1"><Translate>{step.title}</Translate></div>
               <div className="flex items-center gap-2 text-xs text-ink-soft mt-2">
                 <Clock size={14} />
-                <span>{step.duration}</span>
+                <span><Translate>{step.duration}</Translate></span>
               </div>
             </button>
           ))}
@@ -305,41 +305,41 @@ export default function TreatmentJourneyPage() {
         <div className="lg:col-span-2 bg-white rounded-2xl p-6 sm:p-8 border border-ink/10 shadow-sm space-y-6">
           <div className="flex items-center justify-between border-b border-ink/5 pb-4">
             <div>
-              <span className="text-xs font-semibold text-rose-500 uppercase tracking-wider">{activeStep.phase}</span>
-              <h3 className="font-display font-semibold text-xl text-ink mt-1">{activeStep.title}</h3>
+              <span className="text-xs font-semibold text-rose-500 uppercase tracking-wider"><Translate>{activeStep.phase}</Translate></span>
+              <h3 className="font-display font-semibold text-xl text-ink mt-1"><Translate>{activeStep.title}</Translate></h3>
             </div>
             <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-rose-50 text-rose-700 text-xs font-medium rounded-full border border-rose-100">
               <Clock size={14} />
-              {activeStep.duration}
+              <Translate>{activeStep.duration}</Translate>
             </span>
           </div>
 
           <div className="space-y-2">
-            <h4 className="text-xs font-semibold text-ink-soft uppercase tracking-wider">Clinical Purpose</h4>
+            <h4 className="text-xs font-semibold text-ink-soft uppercase tracking-wider"><Translate>Clinical Purpose</Translate></h4>
             <p className="text-sm text-ink leading-relaxed bg-porcelain p-4 rounded-xl border border-ink/5">
-              {activeStep.purpose}
+              <Translate>{activeStep.purpose}</Translate>
             </p>
           </div>
 
           <div className="space-y-3">
-            <h4 className="text-xs font-semibold text-ink-soft uppercase tracking-wider">Standard Clinical Options</h4>
+            <h4 className="text-xs font-semibold text-ink-soft uppercase tracking-wider"><Translate>Standard Clinical Options</Translate></h4>
             <div className="space-y-2">
               {activeStep.options.map((opt, idx) => (
                 <div key={idx} className="flex items-start gap-2 text-sm text-ink">
                   <CheckCircle2 size={16} className="text-emerald-500 mt-0.5 shrink-0" />
-                  <span>{opt}</span>
+                  <span><Translate>{opt}</Translate></span>
                 </div>
               ))}
             </div>
           </div>
 
           <div className="space-y-3">
-            <h4 className="text-xs font-semibold text-ink-soft uppercase tracking-wider">Commonly Reported Side Effects & Management</h4>
+            <h4 className="text-xs font-semibold text-ink-soft uppercase tracking-wider"><Translate>Commonly Reported Side Effects & Management</Translate></h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {activeStep.sideEffects.map((se, idx) => (
                 <div key={idx} className="p-3 bg-amber-50/60 rounded-xl border border-amber-100 text-xs text-amber-900 flex items-center gap-2">
                   <AlertTriangle size={14} className="text-amber-500 shrink-0" />
-                  <span>{se}</span>
+                  <span><Translate>{se}</Translate></span>
                 </div>
               ))}
             </div>
@@ -347,7 +347,7 @@ export default function TreatmentJourneyPage() {
 
           <div className="pt-4 border-t border-ink/5 flex items-center gap-2 text-xs text-ink-soft">
             <BookOpen size={16} className="text-rose-500 shrink-0" />
-            <span><strong className="text-ink">Literature Evidence Grounding:</strong> {activeStep.evidence}</span>
+            <span><strong className="text-ink"><Translate>Literature Evidence Grounding:</Translate></strong> <Translate>{activeStep.evidence}</Translate></span>
           </div>
         </div>
       </div>

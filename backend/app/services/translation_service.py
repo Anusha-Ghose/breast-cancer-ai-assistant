@@ -18,7 +18,7 @@ def translate(text: str, target_lang: str) -> str:
     
     try:
         response = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            model="openai/gpt-oss-20b",
             messages=[
                 {"role": "system", "content": "You are a professional medical translator. Return only the translation."},
                 {"role": "user", "content": prompt}
@@ -58,7 +58,7 @@ Texts to translate:
     
     try:
         response = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            model="openai/gpt-oss-20b",
             messages=[
                 {"role": "system", "content": "You are a professional medical translator. Output valid JSON only."},
                 {"role": "user", "content": prompt}

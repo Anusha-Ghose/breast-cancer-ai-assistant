@@ -109,7 +109,7 @@ export default function HistoryPage() {
                     </span>
                     {report.extracted_entities?.hospital && (
                       <span className="hidden sm:inline-block border-l border-ink/10 pl-4">
-                        {report.extracted_entities.hospital}
+                        <Translate>{report.extracted_entities.hospital}</Translate>
                       </span>
                     )}
                   </div>

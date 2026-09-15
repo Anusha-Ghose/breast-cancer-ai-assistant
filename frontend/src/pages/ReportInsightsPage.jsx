@@ -148,12 +148,12 @@ export default function ReportInsightsPage() {
                   <Translate>Physician Handwritten Prescription Extraction</Translate>
                 </h3>
                 <p className="text-xs text-purple-800">
-                  OCR Vision LLM decoded physician handwriting with sig directions & dosage instructions.
+                  <Translate>OCR Vision LLM decoded physician handwriting with sig directions & dosage instructions.</Translate>
                 </p>
               </div>
             </div>
             <span className="text-xs font-semibold px-2.5 py-1 bg-purple-100 text-purple-800 rounded-full border border-purple-200">
-              {entities.handwritten_confidence_score || mockPrescriptionData.handwritten_confidence_score}% Confidence
+              {entities.handwritten_confidence_score || mockPrescriptionData.handwritten_confidence_score}% <Translate>Confidence</Translate>
             </span>
           </div>
 
@@ -172,9 +172,9 @@ export default function ReportInsightsPage() {
                   </p>
                 )}
                 <div className="flex items-center gap-4 text-xs text-ink-soft pt-1">
-                  <span>Frequency: {med.frequency || 'Once Daily'}</span>
-                  <span>Duration: {med.duration || '5 Years'}</span>
-                  {med.refills && <span>Refills: {med.refills}</span>}
+                  <span><Translate>Frequency:</Translate> <Translate>{med.frequency || 'Once Daily'}</Translate></span>
+                  <span><Translate>Duration:</Translate> <Translate>{med.duration || '5 Years'}</Translate></span>
+                  {med.refills && <span><Translate>Refills:</Translate> {med.refills}</span>}
                 </div>
               </div>
             ))}
@@ -198,12 +198,12 @@ export default function ReportInsightsPage() {
               </div>
               {entities.diagnosis?.length > 0 && (
                 <p className="mt-2 text-sm leading-relaxed text-rose-900/90 font-medium">
-                  Diagnosis: {entities.diagnosis.join(', ')}
+                  <Translate>Diagnosis:</Translate> <Translate>{entities.diagnosis.join(', ')}</Translate>
                 </p>
               )}
               {entities.symptoms?.length > 0 && (
                 <p className="mt-1 text-sm leading-relaxed text-rose-900/90">
-                  Symptoms: {entities.symptoms.join(', ')}
+                  <Translate>Symptoms:</Translate> <Translate>{entities.symptoms.join(', ')}</Translate>
                 </p>
               )}
             </div>
@@ -271,7 +271,7 @@ export default function ReportInsightsPage() {
             </p>
             <ul className="list-disc pl-5 space-y-2 text-sm text-ink/80">
               {entities.doctor_recommendations.map((rec, i) => (
-                <li key={i}>{rec}</li>
+                <li key={i}><Translate>{rec}</Translate></li>
               ))}
             </ul>
           </Card>
@@ -295,14 +295,14 @@ export default function ReportInsightsPage() {
                         {lab.confidence_score}%
                       </span>
                     )}
-                    {lab.is_abnormal && <span className="text-xs font-bold text-rose-600 bg-rose-100 px-2 py-0.5 rounded-full">Abnormal</span>}
+                    {lab.is_abnormal && <span className="text-xs font-bold text-rose-600 bg-rose-100 px-2 py-0.5 rounded-full"><Translate>Abnormal</Translate></span>}
                   </div>
                 </div>
                 <div className="text-xl font-display text-ink mt-2">
                   {lab.value} <span className="text-sm text-ink-soft ml-1">{lab.units}</span>
                 </div>
                 {lab.reference_range && (
-                  <div className="text-xs text-ink-soft mt-1">Ref: {lab.reference_range}</div>
+                  <div className="text-xs text-ink-soft mt-1"><Translate>Ref:</Translate> <Translate>{lab.reference_range}</Translate></div>
                 )}
               </div>
             ))}
