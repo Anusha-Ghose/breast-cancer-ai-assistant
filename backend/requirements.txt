@@ -7,9 +7,13 @@ motor
 python-dotenv
 groq
 httpx
+requests
 pytesseract
 pillow
 pdf2image
+langchain-core
+langchain-groq
+sqlalchemy
 python-jose[cryptography]
 passlib[bcrypt]
 bcrypt
