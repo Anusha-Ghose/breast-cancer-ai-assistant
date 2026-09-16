@@ -15,49 +15,48 @@ async def get_timeline(marker: str | None = None, document_type: str | None = No
     """
     timeline = []
     
-    if user_id:
-        query = {"patient_id": user_id, "status": "completed"}
-        if document_type:
-            query["document_type"] = document_type
-            
-        cursor = db.db.reports.find(query).sort("upload_date", 1)  # Chronological order
-        reports = await cursor.to_list(length=100)
+    target_user_id = user_id or "guest_patient_default"
+    query = {"patient_id": target_user_id, "status": "completed"}
+    if document_type:
+        query["document_type"] = document_type
         
-        for report in reports:
-            entities = report.get("extracted_entities") or {}
-            date = entities.get("report_date") or str(report["upload_date"].date())
+    cursor = db.db.reports.find(query).sort("upload_date", 1)  # Chronological order
+    reports = await cursor.to_list(length=100)
+    for report in reports:
+        entities = report.get("extracted_entities") or {}
+        date = entities.get("report_date") or str(report["upload_date"].date())
+        
+        lab_params = entities.get("lab_parameters") or []
+        
+        if marker:
+            import re
+            clean_marker = re.sub(r'\(.*?\)', '', marker).lower().replace("ae","e").strip()
             
-            lab_params = entities.get("lab_parameters") or []
+            # Filter for specific marker (loose substring matching)
+            param = None
+            for p in lab_params:
+                clean_name = re.sub(r'\(.*?\)', '', p["name"]).lower().replace("ae","e").strip()
+                if clean_marker in clean_name or clean_name in clean_marker:
+                    param = p
+                    break
             
-            if marker:
-                import re
-                clean_marker = re.sub(r'\(.*?\)', '', marker).lower().replace("ae","e").strip()
-                
-                # Filter for specific marker (loose substring matching)
-                param = None
-                for p in lab_params:
-                    clean_name = re.sub(r'\(.*?\)', '', p["name"]).lower().replace("ae","e").strip()
-                    if clean_marker in clean_name or clean_name in clean_marker:
-                        param = p
-                        break
-                
-                if param:
-                    timeline.append({
-                        "date": date,
-                        "value": param.get("value"),
-                        "units": param.get("units"),
-                        "report_id": str(report["_id"])
-                    })
-            else:
-                # All markers
-                for param in lab_params:
-                    timeline.append({
-                        "date": date,
-                        "marker": param["name"],
-                        "value": param.get("value"),
-                        "units": param.get("units"),
-                        "report_id": str(report["_id"])
-                    })
+            if param:
+                timeline.append({
+                    "date": date,
+                    "value": param.get("value"),
+                    "units": param.get("units"),
+                    "report_id": str(report["_id"])
+                })
+        else:
+            # All markers
+            for param in lab_params:
+                timeline.append({
+                    "date": date,
+                    "marker": param["name"],
+                    "value": param.get("value"),
+                    "units": param.get("units"),
+                    "report_id": str(report["_id"])
+                })
 
     if not timeline:
         # Fallback reference clinical trajectory so users can see trends immediately
@@ -75,7 +74,7 @@ async def compare_reports(id1: str, id2: str, language: str = "en", user_id: str
     """
     Compare two reports and return AI generated summary of changes.
     """
-    if not user_id or str(id1).startswith("demo") or str(id2).startswith("demo"):
+    if str(id1).startswith("demo") or str(id2).startswith("demo"):
         return {
             "summary": "CA 15-3 biomarker increased by +18.3% from 24.6 U/mL to 29.1 U/mL across 3 months. Hemoglobin experienced a mild 4.8% reduction. Patient shows favorable response to endocrine maintenance therapy with no acute invasiveness.",
             "confidence_score": 94,
@@ -85,9 +84,10 @@ async def compare_reports(id1: str, id2: str, language: str = "en", user_id: str
             ]
         }
 
+    effective_id = user_id or "guest_patient_default"
     try:
-        r1 = await db.db.reports.find_one({"_id": ObjectId(id1), "patient_id": user_id})
-        r2 = await db.db.reports.find_one({"_id": ObjectId(id2), "patient_id": user_id})
+        r1 = await db.db.reports.find_one({"_id": ObjectId(id1), "$or": [{"patient_id": effective_id}, {"patient_id": "guest_patient_default"}]})
+        r2 = await db.db.reports.find_one({"_id": ObjectId(id2), "$or": [{"patient_id": effective_id}, {"patient_id": "guest_patient_default"}]})
     except Exception:
         r1, r2 = None, None
     

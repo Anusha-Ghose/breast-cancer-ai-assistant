@@ -5,16 +5,21 @@ from bson import ObjectId
 import os
 
 from app.db.database import db
-from app.core.security import get_current_user_id, get_optional_user_id
+from app.core.security import get_optional_user_id
 from app.models.report import ReportOut
 
 router = APIRouter()
 
+DEFAULT_GUEST_ID = "guest_patient_default"
+
 @router.get("/", response_model=List[ReportOut])
 async def list_reports(user_id: str | None = Depends(get_optional_user_id)):
-    if not user_id:
-        return []
-    cursor = db.db.reports.find({"patient_id": user_id}).sort("upload_date", -1)
+    if user_id:
+        query = {"$or": [{"patient_id": user_id}, {"patient_id": DEFAULT_GUEST_ID}]}
+    else:
+        query = {"patient_id": DEFAULT_GUEST_ID}
+        
+    cursor = db.db.reports.find(query).sort("upload_date", -1)
     reports = await cursor.to_list(length=100)
     
     result = []
@@ -24,8 +29,18 @@ async def list_reports(user_id: str | None = Depends(get_optional_user_id)):
     return result
 
 @router.get("/{report_id}", response_model=ReportOut)
-async def get_report(report_id: str, user_id: str = Depends(get_current_user_id)):
-    report = await db.db.reports.find_one({"_id": ObjectId(report_id), "patient_id": user_id})
+async def get_report(report_id: str, user_id: str | None = Depends(get_optional_user_id)):
+    try:
+        obj_id = ObjectId(report_id)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid report ID format")
+        
+    if user_id:
+        query = {"_id": obj_id, "$or": [{"patient_id": user_id}, {"patient_id": DEFAULT_GUEST_ID}]}
+    else:
+        query = {"_id": obj_id}
+        
+    report = await db.db.reports.find_one(query)
     if not report:
         raise HTTPException(status_code=404, detail="Report not found")
     
@@ -33,25 +48,39 @@ async def get_report(report_id: str, user_id: str = Depends(get_current_user_id)
     return ReportOut(**report)
 
 @router.get("/{report_id}/view")
-async def view_report_file(report_id: str, user_id: str = Depends(get_current_user_id)):
-    report = await db.db.reports.find_one({"_id": ObjectId(report_id), "patient_id": user_id})
+async def view_report_file(report_id: str, user_id: str | None = Depends(get_optional_user_id)):
+    try:
+        obj_id = ObjectId(report_id)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid report ID format")
+        
+    report = await db.db.reports.find_one({"_id": obj_id})
     if not report:
         raise HTTPException(status_code=404, detail="Report not found")
     
-    file_path = report["file_path"]
-    if not os.path.exists(file_path):
+    file_path = report.get("file_path")
+    if not file_path or not os.path.exists(file_path):
         raise HTTPException(status_code=404, detail="File not found on disk")
         
     return FileResponse(file_path)
 
 @router.delete("/{report_id}")
-async def delete_report(report_id: str, user_id: str = Depends(get_current_user_id)):
-    report = await db.db.reports.find_one({"_id": ObjectId(report_id), "patient_id": user_id})
+async def delete_report(report_id: str, user_id: str | None = Depends(get_optional_user_id)):
+    try:
+        obj_id = ObjectId(report_id)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid report ID format")
+        
+    query = {"_id": obj_id}
+    if user_id:
+        query["$or"] = [{"patient_id": user_id}, {"patient_id": DEFAULT_GUEST_ID}]
+        
+    report = await db.db.reports.find_one(query)
     if not report:
         raise HTTPException(status_code=404, detail="Report not found")
         
     # Delete from DB
-    await db.db.reports.delete_one({"_id": ObjectId(report_id)})
+    await db.db.reports.delete_one({"_id": obj_id})
     
     # Delete file from disk
     file_path = report.get("file_path")

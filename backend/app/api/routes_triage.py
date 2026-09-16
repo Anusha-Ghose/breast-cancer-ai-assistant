@@ -27,11 +27,40 @@ async def assess_triage(payload: TriageRequest):
     symptoms = [s.lower() for s in (payload.symptoms or [])]
     findings = payload.findings or {}
     
+    # Look for BI-RADS in findings root, diagnosis list, or complex terminologies
     bi_rads = str(findings.get("bi_rads") or "")
+    if not bi_rads:
+        for diag in (findings.get("diagnosis") or []):
+            if "bi-rads" in str(diag).lower() or "birads" in str(diag).lower():
+                bi_rads = str(diag)
+                break
+        if not bi_rads:
+            for term in (findings.get("complex_terminologies") or []):
+                t_name = str(term.get("term", "") if isinstance(term, dict) else getattr(term, "term", "")).lower()
+                if "bi-rads" in t_name or "birads" in t_name:
+                    bi_rads = t_name
+                    break
+
+    # Look for CA 15-3 in findings root or inside lab_parameters
     ca153 = findings.get("ca15_3")
+    if not ca153:
+        for lab in (findings.get("lab_parameters") or []):
+            name = (lab.get("name") if isinstance(lab, dict) else getattr(lab, "name", "") or "").lower()
+            if "ca 15-3" in name or "ca15-3" in name or "ca 15.3" in name or "ca15.3" in name:
+                try:
+                    val_str = str(lab.get("value") if isinstance(lab, dict) else getattr(lab, "value", "") or "")
+                    import re
+                    match = re.search(r'[-+]?\d*\.?\d+', val_str)
+                    if match:
+                        ca153 = float(match.group())
+                        break
+                except Exception:
+                    pass
+
     fever = any("fever" in s or "chills" in s for s in symptoms)
     chemo = any("chemo" in s for s in symptoms)
     acute_pain = any("severe pain" in s or "chest pain" in s or "shortness of breath" in s for s in symptoms)
+
     
     # Red / Immediate Triage (Score 1)
     if any("shortness of breath" in s or "chest pain" in s or "unconscious" in s for s in symptoms):
